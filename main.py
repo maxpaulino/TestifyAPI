@@ -123,7 +123,7 @@ def add_question():
         'question': question,
         'choices': choices,
         'answer': answer,
-        'status': "unchecked",
+        'status': "pending",
         'revised': False
     }
 
