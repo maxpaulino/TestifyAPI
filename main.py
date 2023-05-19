@@ -25,6 +25,9 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)
 app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
 jwt = JWTManager(app)
 
+def_username = os.environ['USERNAME']
+def_password = os.environ['PASSWORD']
+
 # This is a Python function named `generate_mult_choice`. It takes in two 
 # arguments: `tag` which represents a string topic, and `level` which is a string 
 # representing the CEFR language level. The function generates a multiple-choice 
@@ -46,9 +49,8 @@ def generate_mult_choice(tag, level):
             {"role": "system", "content": 
 # System content
                 "You are a bot that exclusively generates multiple-choice questions in this format:\n" + 
-             "Q:\n\nA)\nB)\nC)\nD)\n\nA:"
+             "Q:\n\nA)\nB)\nC)\nD)\n\nA:"},
 
-            },
             {"role": "user", "content": prompt}
         ],
         temperature=0.75
@@ -66,7 +68,7 @@ def login():
     username = request.json.get('username')
     password = request.json.get('password')
 
-    if username != 'maxpaulino' or password != 'bGN6bqSa':
+    if username != def_username or password != def_password:
         return jsonify({'message': 'Invalid credentials'}), 401
 
     access_token = create_access_token(identity=username)
