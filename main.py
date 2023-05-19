@@ -1,4 +1,5 @@
 # Imports
+
 import os
 import openai
 from flask import Flask, request, jsonify
@@ -33,10 +34,11 @@ def_password = os.environ['PASSWORD']
 # representing the CEFR language level. The function generates a multiple-choice 
 # question prompt based on the provided topic and language level using OpenAI's 
 # GPT-3. The function returns the generated prompt as a string.
+
 def generate_mult_choice(tag, level): 
 
     prompt = (
-# User content
+
         "Generate a multiple-choice question with 4 options and the answer. "
         "This question should be a CEFR English Language Exam question at the {} level and should be in relation to this topic: {}. "
 
@@ -47,10 +49,11 @@ def generate_mult_choice(tag, level):
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": 
-# System content
-                "You are a bot that exclusively generates multiple-choice questions in this format:\n" + 
-             "Q:\n\nA)\nB)\nC)\nD)\n\nA:"},
 
+                "You are a bot that exclusively generates multiple-choice questions in this format:\n" + 
+             "Q:\n\nA)\nB)\nC)\nD)\n\nA:"
+
+             },
             {"role": "user", "content": prompt}
         ],
         temperature=0.75
@@ -62,6 +65,7 @@ def generate_mult_choice(tag, level):
 # request with username and password data in JSON format. If the credentials
 # are invalid, a 401 error is returned, otherwise, an access token is created
 # and returned with a 200 success status code.
+
 @app.route('/login', methods=['POST'])
 def login():
 
@@ -78,6 +82,7 @@ def login():
 # This code defines a Flask route for an endpoint that is protected with JWT authentication. 
 # The endpoint returns a JSON response containing a message and the current user's 
 # identity.
+
 @app.route('/protected', methods=['GET'])
 @jwt_required()  
 def protected():
@@ -93,6 +98,7 @@ def protected():
 # to create a dictionary representing the question and inserted into the 
 # "Questions" collection using PyMongo. Finally, a success message is returned 
 # as a JSON response.
+
 @app.route('/questions', methods=['POST'])
 @jwt_required() 
 def add_question():
@@ -139,6 +145,7 @@ def add_question():
 # questions from a MongoDB database. The function creates a list of dictionaries
 # containing the relevant fields for each question and returns it as a JSON 
 # object. 
+
 @app.route('/questions', methods=['GET'])
 @jwt_required()  
 def get_questions():
@@ -165,6 +172,7 @@ def get_questions():
 # question data is returned in a JSON format similar to the original 
 # `get_questions` handler. If the question is not found, a 404 error message is 
 # returned instead.
+
 @app.route('/questions/<question_id>', methods=['GET'])
 @jwt_required()  
 def get_question_by_id(question_id):
@@ -192,6 +200,7 @@ def get_question_by_id(question_id):
 # it returns a JSON object with the message "Question deleted successfully". If 
 # the question is not found, it returns a JSON object with the message 
 # "Question not found" and a 404 status code.
+
 @app.route('/questions/<question_id>', methods=['DELETE'])
 @jwt_required()  
 def delete_question_by_id(question_id):
@@ -210,6 +219,7 @@ def delete_question_by_id(question_id):
 # from the 'questions' collection having the 'status' field set to 'denied', and 
 # returns a JSON object containing a message indicating the number of documents 
 # matching the query that were deleted.
+
 @app.route('/questions/denied', methods=['DELETE'])
 @jwt_required() 
 def delete_denied_questions():
@@ -247,5 +257,6 @@ def update_question_by_id(question_id):
         return {'message': 'Question not found.'}, 404
 
 # Main function
+
 if __name__ == '__main__':
     app.run(debug=True)
