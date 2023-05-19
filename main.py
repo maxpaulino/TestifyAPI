@@ -134,11 +134,11 @@ def add_question():
         return {'error': str(e)}
 
     return {'message': 'Question added successfully'}
+
 # This is a Flask route function that handles a GET request for a collection of
 # questions from a MongoDB database. The function creates a list of dictionaries
 # containing the relevant fields for each question and returns it as a JSON 
-# object. It is well-organized and employs good coding practices with clear variable
-# naming and a simple for loop to iterate through the database records.
+# object. 
 @app.route('/questions', methods=['GET'])
 @jwt_required()  
 def get_questions():
@@ -225,7 +225,7 @@ def delete_denied_questions():
 # on the query parameters provided in the request. If the question is found and
 # updated, the route returns a success message with a 200 status code. If the
 # question is not found, it returns a "not found" message with a 404 status code. 
-# Overall, this code provides a RESTful endpoint for updating question data
+# Overall, this code provides a RESTful endpoint for updating question data.
 @app.route('/questions/<question_id>', methods=['PUT'])
 @jwt_required()  
 def update_question_by_id(question_id):
