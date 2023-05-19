@@ -12,13 +12,17 @@ from dotenv import load_dotenv
 # URI using PyMongo library. The API key for OpenAI API is also declared and
 # initialized for future use. Lastly it also loads the environment variables 
 # from the .env file.
+
 load_dotenv()
-app = Flask(__name__)
+
 openai.api_key = os.environ['OPENAI_API_KEY']
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)  # Access token expiration time
-app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
+
+app = Flask(__name__)
 app.config['MONGO_URI'] = os.environ['MONGO_URI']
 mongo = PyMongo(app)
+
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)  
+app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
 jwt = JWTManager(app)
 
 # This is a Python function named `generate_mult_choice`. It takes in two 
@@ -27,30 +31,29 @@ jwt = JWTManager(app)
 # question prompt based on the provided topic and language level using OpenAI's 
 # GPT-3. The function returns the generated prompt as a string.
 def generate_mult_choice(tag, level): 
+
     prompt = (
+# User content
         "Generate a multiple-choice question with 4 options and the answer. "
         "This question should be a CEFR English Language Exam question at the {} level and should be in relation to this topic: {}. "
+
     ).format(level, tag)
+
     completion = openai.ChatCompletion.create(
+
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": 
-                # "Here are the CEFR Guidelines for each level: \n" +
-                #     "A1 (Basic User): Can understand and use familiar everyday expressions and very basic phrases aimed at the satisfaction of needs of a concrete type. Can introduce him/herself and others and can ask and answer questions about personal details such as where he/she lives, people he/she knows and things he/she has. Can interact in a simple way provided the other person talks slowly and clearly and is prepared to help.\n" +
-                #     "A2 (Basic User): Can understand sentences and frequently used expressions related to areas of most immediate relevance (e.g. very basic personal and family information, shopping, local geography, employment). Can communicate in simple and routine tasks requiring a simple and direct exchange of information on familiar and routine matters. Can describe in simple terms aspects of his/her background, immediate environment and matters in areas of immediate need.\n" +
-                #     "B1 (Independent User): Can understand the main points of clear standard input on familiar matters regularly encountered in work, school, leisure, etc. Can deal with most situations likely to arise whilst travelling in an area where the language is spoken. Can produce simple connected text on topics which are familiar or of personal interest. Can describe experiences and events, dreams, hopes & ambitions and briefly give reasons and explanations for opinions and plans.\n" +
-                #     "B2 (Independent User): Can understand the main ideas of complex text on both concrete and abstract topics, including technical discussions in his/her field of specialisation. Can interact with a degree of fluency and spontaneity that makes regular interaction with native speakers quite possible without strain for either party. Can produce clear, detailed text on a wide range of subjects and explain a viewpoint on a topical issue giving the advantages and disadvantages of various options.\n" +
-                #     "C1 (Proficient User): Can understand a wide range of demanding, longer texts, and recognise implicit meaning. Can express him/ herself fluently and spontaneously without much obvious searching for expressions. Can use language flexibly and effectively for social, academic and professional purposes. Can produce clear, well-structured, detailed text on complex subjects, showing controlled use of organisational patterns, connectors and cohesive devices.\n" +
-                #     "C2 (Proficient User): Can understand with ease virtually everything heard or read. Can summarise information from different spoken and written sources, reconstructing arguments and accounts in a coherent presentation. Can express him/herself spontaneously, very fluently and precisely, differentiating finer shades of meaning even in more complex situations.\n\n" +
-                # "Don't mention the CEFR guidelines explicitly but keep them in mind when responding. " +
-                # "You are a question generator. " +
+# System content
                 "You are a bot that exclusively generates multiple-choice questions in this format:\n" + 
              "Q:\n\nA)\nB)\nC)\nD)\n\nA:"
+
             },
             {"role": "user", "content": prompt}
         ],
         temperature=0.75
     )
+
     return completion.choices[0].message.content
 
 # This is a Flask route for user login authentication. The code receives a POST
@@ -59,22 +62,27 @@ def generate_mult_choice(tag, level):
 # and returned with a 200 success status code.
 @app.route('/login', methods=['POST'])
 def login():
+
     username = request.json.get('username')
     password = request.json.get('password')
-    if username != 'admin' or password != 'password':
+
+    if username != 'maxpaulino' or password != 'bGN6bqSa':
         return jsonify({'message': 'Invalid credentials'}), 401
+
     access_token = create_access_token(identity=username)
+
     return jsonify({'access_token': access_token}), 200
 
 # This code defines a Flask route for an endpoint that is protected with JWT authentication. 
 # The endpoint returns a JSON response containing a message and the current user's 
 # identity.
 @app.route('/protected', methods=['GET'])
-@jwt_required()  # Require valid access token for authentication
+@jwt_required()  
 def protected():
-    current_user = get_jwt_identity()
-    return jsonify({'message': 'Protected endpoint', 'user': current_user}), 200
 
+    current_user = get_jwt_identity()
+
+    return jsonify({'message': 'Protected endpoint', 'user': current_user}), 200
 
 # This function is a Flask route that handles the addition of a multiple choice
 # question to a MongoDB database. It accepts a JSON request containing the tag
@@ -84,22 +92,29 @@ def protected():
 # "Questions" collection using PyMongo. Finally, a success message is returned 
 # as a JSON response.
 @app.route('/questions', methods=['POST'])
-@jwt_required()  # Require valid access token for authentication
+@jwt_required() 
 def add_question():
+
     data = request.json
     tag = data['tag']
     level = data['level']
+
     if not tag or not level:
         return {'error': 'Invalid input data'}
+
     prompt_list = []
+
     while len(prompt_list) != 3:
         while len(prompt_list[3]) == 4:
             prompt_list = generate_mult_choice(tag, level).split('\n\n')
+
     question = prompt_list[0][3:]
     choices = prompt_list[1].split('\n')
     answer = prompt_list[2][3:]
+
     if answer.startswith('wer: '):
         answer = prompt_list[2][8:]
+
     question_data = {
         'tag': tag,
         'level': level,
@@ -109,11 +124,13 @@ def add_question():
         'status': "unchecked",
         'revised': False
     }
+
     questions_collection = mongo.db.questions
     try:
         questions_collection.insert_one(question_data)
     except Exception as e:
         return {'error': str(e)}
+
     return {'message': 'Question added successfully'}
 # This is a Flask route function that handles a GET request for a collection of
 # questions from a MongoDB database. The function creates a list of dictionaries
@@ -121,10 +138,12 @@ def add_question():
 # object. It is well-organized and employs good coding practices with clear variable
 # naming and a simple for loop to iterate through the database records.
 @app.route('/questions', methods=['GET'])
-@jwt_required()  # Require valid access token for authentication
+@jwt_required()  
 def get_questions():
+
     questions_collection = mongo.db.questions
     questions = []
+
     for question in questions_collection.find():
         questions.append({
             'id': str(question['_id']),
@@ -136,6 +155,7 @@ def get_questions():
             'status': question['status'],
             'revised': question['revised']
         })
+
     return {'questions': questions}
 
 # This function takes in a `question_id` parameter in the URL and attempts to
@@ -144,10 +164,12 @@ def get_questions():
 # `get_questions` handler. If the question is not found, a 404 error message is 
 # returned instead.
 @app.route('/questions/<question_id>', methods=['GET'])
-@jwt_required()  # Require valid access token for authentication
+@jwt_required()  
 def get_question_by_id(question_id):
+
     questions_collection = mongo.db.questions
     question = questions_collection.find_one({'_id': ObjectId(question_id)})
+    
     if question:
         return {
             'id': str(question['_id']),
@@ -169,10 +191,12 @@ def get_question_by_id(question_id):
 # the question is not found, it returns a JSON object with the message 
 # "Question not found" and a 404 status code.
 @app.route('/questions/<question_id>', methods=['DELETE'])
-@jwt_required()  # Require valid access token for authentication
+@jwt_required()  
 def delete_question_by_id(question_id):
+
     questions_collection = mongo.db.questions
     result = questions_collection.delete_one({'_id': ObjectId(question_id)})
+
     if result.deleted_count > 0:
         return {'message': 'Question deleted successfully.'}
     else:
@@ -185,10 +209,12 @@ def delete_question_by_id(question_id):
 # returns a JSON object containing a message indicating the number of documents 
 # matching the query that were deleted.
 @app.route('/questions/denied', methods=['DELETE'])
-@jwt_required()  # Require valid access token for authentication
+@jwt_required() 
 def delete_denied_questions():
+
     questions_collection = mongo.db.questions
     result = questions_collection.delete_many({'status': 'denied'})
+
     return {'message': f'{result.deleted_count} questions with status "denied" deleted successfully.'}
 
 # This code defines a Flask route that handles PUT requests to update a question
@@ -198,15 +224,17 @@ def delete_denied_questions():
 # updated, the route returns a success message with a 200 status code. If the
 # question is not found, it returns a "not found" message with a 404 status code. 
 # Overall, this code provides a RESTful endpoint for updating question data
-# in a backend system.
 @app.route('/questions/<question_id>', methods=['PUT'])
-@jwt_required()  # Require valid access token for authentication
+@jwt_required()  
 def update_question_by_id(question_id):
+
     questions_collection = mongo.db.questions
     question = questions_collection.find_one({'_id': ObjectId(question_id)})
+
     if question:
         status = request.args.get('status')
         revised = True
+
         questions_collection.update_one(
             {'_id': ObjectId(question_id)}, 
             {'$set': {'status': status, 
@@ -219,4 +247,3 @@ def update_question_by_id(question_id):
 # Main function
 if __name__ == '__main__':
     app.run(debug=True)
-
