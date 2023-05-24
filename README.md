@@ -51,7 +51,7 @@ python app.py
 
 - `DELETE /questions/denied`: Delete all questions with the "denied" status.
 
-- `PUT /questions/<question_id>?status=<status>`: Update the status of a
+- `PUT /questions/<question_id>`: Update the status of a
   question by its ID.
 
 ### Usage
@@ -100,5 +100,11 @@ The API will generate the question and store it in the database.
    `/questions/denied`.
 
 8. Update the status of a question by sending a PUT request to
-   `/questions/<question_id>?status=<status>`, where `<status>` can be
-   "accepted", "rejected", or "pending".
+   `/questions/<question_id> with the following JSON payload. You can
+   set the states to "approved" or "denied".
+
+```json
+{
+  "status": "<denied||approved>"
+}
+```
