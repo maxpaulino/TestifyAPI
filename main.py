@@ -9,10 +9,10 @@ import datetime
 from bson import ObjectId
 from dotenv import load_dotenv
 
-# This code initializes a Flask application and configures a MongoDB database
-# URI using PyMongo library. The API key for OpenAI API is also declared and
-# initialized for future use. Lastly it also loads the environment variables 
-# from the .env file.
+# This code initializes a Flask application and configures a MongoDB database URI
+# using PyMongo library. The API key for OpenAI API is also declared and
+# initialized for future use. Lastly it also loads the environment variables from
+# the .env file.
 
 load_dotenv()
 
@@ -40,7 +40,7 @@ def generate_mult_choice(tag, level):
     prompt = (
 
         "Generate a multiple-choice question with 4 options and the answer. "
-        "This question should be a CEFR English Language Exam question at the {} level and should be in relation to this topic: {}. "
+        "This question should be a CEFR certified English Language Exam question at the {} level and should be in relation to this topic: {}. "
 
     ).format(level, tag)
 
@@ -113,8 +113,10 @@ def add_question():
     prompt_list = []
 
     while len(prompt_list) != 3:
-        while len(prompt_list[3]) == 4:
+        prompt_list = generate_mult_choice(tag, level).split('\n\n')
+        while len(prompt_list[2]) == 4:
             prompt_list = generate_mult_choice(tag, level).split('\n\n')
+            break;
 
     question = prompt_list[0][3:]
     choices = prompt_list[1].split('\n')
@@ -236,6 +238,7 @@ def delete_denied_questions():
 # updated, the route returns a success message with a 200 status code. If the
 # question is not found, it returns a "not found" message with a 404 status code. 
 # Overall, this code provides a RESTful endpoint for updating question data.
+
 @app.route('/questions/<question_id>', methods=['PUT'])
 @jwt_required()  
 def update_question_by_id(question_id):
@@ -244,7 +247,8 @@ def update_question_by_id(question_id):
     question = questions_collection.find_one({'_id': ObjectId(question_id)})
 
     if question:
-        status = request.args.get('status')
+        data = request.json
+        status = data['status']
         revised = True
 
         questions_collection.update_one(
