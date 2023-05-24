@@ -100,7 +100,7 @@ The API will generate the question and store it in the database.
    `/questions/denied`.
 
 8. Update the status of a question by sending a PUT request to
-   `/questions/<question_id> with the following JSON payload. You can
+   `/questions/<question_id>` with the following JSON payload. You can
    set the states to "approved" or "denied".
 
 ```json
