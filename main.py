@@ -112,11 +112,13 @@ def add_question():
 
     prompt_list = []
 
-    while len(prompt_list) != 3:
-        prompt_list = generate_mult_choice(tag, level).split('\n\n')
-        while len(prompt_list[2]) == 4:
-            prompt_list = generate_mult_choice(tag, level).split('\n\n')
-            break;
+    ready = False
+
+    while ready == False:
+        prompt_list = generate_mult_choice(tag,level).split('\n\n')
+        if len(prompt_list) == 3:
+            if len(prompt_list[2]) != 4:
+                ready = True
 
     question = prompt_list[0][3:]
     choices = prompt_list[1].split('\n')
@@ -135,7 +137,7 @@ def add_question():
         'revised': False
     }
 
-    questions_collection = mongo.db.questions
+    questions_collection = mongo.db.mc_questions
     try:
         questions_collection.insert_one(question_data)
     except Exception as e:
@@ -152,7 +154,7 @@ def add_question():
 @jwt_required()  
 def get_questions():
 
-    questions_collection = mongo.db.questions
+    questions_collection = mongo.db.mc_questions
     questions = []
 
     for question in questions_collection.find():
@@ -179,7 +181,7 @@ def get_questions():
 @jwt_required()  
 def get_question_by_id(question_id):
 
-    questions_collection = mongo.db.questions
+    questions_collection = mongo.db.mc_questions
     question = questions_collection.find_one({'_id': ObjectId(question_id)})
     
     if question:
@@ -207,7 +209,7 @@ def get_question_by_id(question_id):
 @jwt_required()  
 def delete_question_by_id(question_id):
 
-    questions_collection = mongo.db.questions
+    questions_collection = mongo.db.mc_questions
     result = questions_collection.delete_one({'_id': ObjectId(question_id)})
 
     if result.deleted_count > 0:
@@ -226,7 +228,7 @@ def delete_question_by_id(question_id):
 @jwt_required() 
 def delete_denied_questions():
 
-    questions_collection = mongo.db.questions
+    questions_collection = mongo.db.mc_questions
     result = questions_collection.delete_many({'status': 'denied'})
 
     return {'message': f'{result.deleted_count} questions with status "denied" deleted successfully.'}
@@ -243,7 +245,7 @@ def delete_denied_questions():
 @jwt_required()  
 def update_question_by_id(question_id):
 
-    questions_collection = mongo.db.questions
+    questions_collection = mongo.db.mc_questions
     question = questions_collection.find_one({'_id': ObjectId(question_id)})
 
     if question:
