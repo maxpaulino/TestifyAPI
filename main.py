@@ -19,7 +19,7 @@ load_dotenv()
 openai.api_key = os.environ['OPENAI_API_KEY']
 
 app = Flask(__name__)
-app.config['MONGO_URI'] = os.environ['MONGO_URI']
+app.config['MONGO_URI'] = f"mongodb+srv://maxpaulino:{os.environ['MONGO_PASSWORD']}@testify.mgathan.mongodb.net/Questions?retryWrites=true&w=majority"
 mongo = PyMongo(app)
 
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)  
@@ -265,4 +265,4 @@ def update_question_by_id(question_id):
 # Main function
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
