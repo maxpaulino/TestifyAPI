@@ -7,7 +7,7 @@ from flask_pymongo import PyMongo
 # from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 import datetime
 from bson import ObjectId
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 # This code initializes a Flask application and configures a MongoDB database URI
 # using PyMongo library. The API key for OpenAI API is also declared and
