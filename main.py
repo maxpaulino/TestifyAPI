@@ -6,15 +6,19 @@ from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
 import datetime
 from bson import ObjectId
+from flask_cors import CORS
 
 # This code initializes a Flask application and configures a MongoDB database URI
 # using PyMongo library. The API key for OpenAI API is also declared and
 # initialized for future use. Lastly it also loads the environment variables from
 # the .env file.
 
+PORT = 80
+
 openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 app = Flask(__name__)
+CORS(app, origins=[f"http://localhost:{PORT}", "https://chat.openai.com"])
 app.config['MONGO_URI'] = f"mongodb+srv://maxpaulino:{os.environ.get('MONGO_PASSWORD')}@testify.mgathan.mongodb.net/Questions?retryWrites=true&w=majority"
 mongo = PyMongo(app)
 
@@ -49,6 +53,26 @@ def generate_mult_choice(tag, level):
     )
 
     return completion.choices[0].message.content
+
+# This is a Flask route function that serves the 'ai-plugin.json' file located
+# in the '.well-known' directory. The function uses the send_from_directory
+# function to get the file from the directory and returns it in the response.
+
+@app.route('/.well-known/ai-plugin.json')
+def serve_manifest():
+    return send_from_directory(os.path.dirname(__file__), 'ai-plugin.json')
+
+# This is a Flask route handler that serves an OpenAPI specification file in
+# YAML format. The file is read from the local directory, converted to a Python
+# dictionary using the PyYAML library, and then returned as a JSON response
+# using Flask's jsonify function.
+
+@app.route('/.well-known/openapi.yaml')
+def serve_openapi_yaml():
+    with open(os.path.join(os.path.dirname(__file__), 'openapi.yaml'), 'r') as f:
+        yaml_data = f.read()
+    yaml_data = yaml.load(yaml_data, Loader=yaml.FullLoader)
+    return jsonify(yaml_data)
 
 # This function is a Flask route that handles the addition of a multiple choice
 # question to a MongoDB database. It accepts a JSON request containing the tag
@@ -218,4 +242,4 @@ def update_question_by_id(question_id):
 # Main function
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=True, port=PORT)
