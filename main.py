@@ -4,7 +4,6 @@ import os
 import openai
 from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
-# from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 import datetime
 from bson import ObjectId
 
@@ -13,15 +12,11 @@ from bson import ObjectId
 # initialized for future use. Lastly it also loads the environment variables from
 # the .env file.
 
-
-
 openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = f"mongodb+srv://maxpaulino:{os.environ.get('MONGO_PASSWORD')}@testify.mgathan.mongodb.net/Questions?retryWrites=true&w=majority"
 mongo = PyMongo(app)
-
-
 
 # This is a Python function named `generate_mult_choice`. It takes in two 
 # arguments: `tag` which represents a string topic, and `level` which is a string 
