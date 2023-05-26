@@ -4,7 +4,7 @@ import os
 import openai
 from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
+# from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 import datetime
 from bson import ObjectId
 from dotenv import load_dotenv
@@ -14,20 +14,21 @@ from dotenv import load_dotenv
 # initialized for future use. Lastly it also loads the environment variables from
 # the .env file.
 
-load_dotenv()
+# load_dotenv()
 
-openai.api_key = os.environ['OPENAI_API_KEY']
+
+openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 app = Flask(__name__)
-app.config['MONGO_URI'] = os.environ['MONGO_URI']
+app.config['MONGO_URI'] = f"mongodb+srv://maxpaulino:{os.environ.get('MONGO_PASSWORD')}@testify.mgathan.mongodb.net/Questions?retryWrites=true&w=majority"
 mongo = PyMongo(app)
 
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)  
-app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
-jwt = JWTManager(app)
+# app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)  
+# app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
+# jwt = JWTManager(app)
 
-def_username = os.environ['USERNAME']
-def_password = os.environ['PASSWORD']
+# def_username = os.environ.get('USERNAME')
+# def_password = os.environ.get('PASSWORD')
 
 # This is a Python function named `generate_mult_choice`. It takes in two 
 # arguments: `tag` which represents a string topic, and `level` which is a string 
@@ -61,35 +62,45 @@ def generate_mult_choice(tag, level):
 
     return completion.choices[0].message.content
 
+# This code defines a Flask route ("/") that returns a JSON
+# response with a message "Welcome to Tasks app!". It also gets
+# the hostname using the socket module.
+
+@app.route("/")
+def index():
+    return jsonify(
+        message="Welcome to Testify!"
+    )
+
 # This is a Flask route for user login authentication. The code receives a POST
 # request with username and password data in JSON format. If the credentials
 # are invalid, a 401 error is returned, otherwise, an access token is created
 # and returned with a 200 success status code.
 
-@app.route('/login', methods=['POST'])
-def login():
-
-    username = request.json.get('username')
-    password = request.json.get('password')
-
-    if username != def_username or password != def_password:
-        return jsonify({'message': 'Invalid credentials'}), 401
-
-    access_token = create_access_token(identity=username)
-
-    return jsonify({'access_token': access_token}), 200
+# @app.route('/login', methods=['POST'])
+# def login():
+#
+#     username = request.json.get('username')
+#     password = request.json.get('password')
+#
+#     if username != def_username or password != def_password:
+#         return jsonify({'message': 'Invalid credentials'}), 401
+#
+#     access_token = create_access_token(identity=username)
+#
+#     return jsonify({'access_token': access_token}), 200
 
 # This code defines a Flask route for an endpoint that is protected with JWT authentication. 
 # The endpoint returns a JSON response containing a message and the current user's 
 # identity.
 
-@app.route('/protected', methods=['GET'])
-@jwt_required()  
-def protected():
-
-    current_user = get_jwt_identity()
-
-    return jsonify({'message': 'Protected endpoint', 'user': current_user}), 200
+# @app.route('/protected', methods=['GET'])
+# @jwt_required()  
+# def protected():
+#
+#     current_user = get_jwt_identity()
+#
+#     return jsonify({'message': 'Protected endpoint', 'user': current_user}), 200
 
 # This function is a Flask route that handles the addition of a multiple choice
 # question to a MongoDB database. It accepts a JSON request containing the tag
@@ -100,7 +111,7 @@ def protected():
 # as a JSON response.
 
 @app.route('/questions', methods=['POST'])
-@jwt_required() 
+# @jwt_required() 
 def add_question():
 
     data = request.json
@@ -151,7 +162,7 @@ def add_question():
 # object. 
 
 @app.route('/questions', methods=['GET'])
-@jwt_required()  
+# @jwt_required()  
 def get_questions():
 
     questions_collection = mongo.db.mc_questions
@@ -178,7 +189,7 @@ def get_questions():
 # returned instead.
 
 @app.route('/questions/<question_id>', methods=['GET'])
-@jwt_required()  
+# @jwt_required()  
 def get_question_by_id(question_id):
 
     questions_collection = mongo.db.mc_questions
@@ -206,7 +217,7 @@ def get_question_by_id(question_id):
 # "Question not found" and a 404 status code.
 
 @app.route('/questions/<question_id>', methods=['DELETE'])
-@jwt_required()  
+# @jwt_required()  
 def delete_question_by_id(question_id):
 
     questions_collection = mongo.db.mc_questions
@@ -225,7 +236,7 @@ def delete_question_by_id(question_id):
 # matching the query that were deleted.
 
 @app.route('/questions/denied', methods=['DELETE'])
-@jwt_required() 
+# @jwt_required() 
 def delete_denied_questions():
 
     questions_collection = mongo.db.mc_questions
@@ -242,7 +253,7 @@ def delete_denied_questions():
 # Overall, this code provides a RESTful endpoint for updating question data.
 
 @app.route('/questions/<question_id>', methods=['PUT'])
-@jwt_required()  
+# @jwt_required()  
 def update_question_by_id(question_id):
 
     questions_collection = mongo.db.mc_questions
@@ -265,4 +276,4 @@ def update_question_by_id(question_id):
 # Main function
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
