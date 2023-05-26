@@ -2,24 +2,10 @@ openapi: 3.0.3
 info:
   title: Testify API
   description: An API for generating and managing multiple-choice questions
-  version: 1.0.0
+  version: 1.0.3
 servers:
   - url: http://localhost:80
 paths:
-  /:
-    get:
-      summary: Get API information
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Welcome to Testify!
   /questions:
     post:
       summary: Add a multiple-choice question
