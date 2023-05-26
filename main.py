@@ -50,15 +50,6 @@ def generate_mult_choice(tag, level):
 
     return completion.choices[0].message.content
 
-# This code defines a Flask route ("/") that returns a JSON
-# response with a message "Welcome to Tasks app!". 
-
-@app.route("/")
-def index():
-    return jsonify(
-        message="Welcome to Testify!"
-    )
-
 # This function is a Flask route that handles the addition of a multiple choice
 # question to a MongoDB database. It accepts a JSON request containing the tag
 # and level of the question and calls the `generate_mult_choice` function to
