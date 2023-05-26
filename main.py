@@ -14,20 +14,21 @@ from dotenv import load_dotenv
 # initialized for future use. Lastly it also loads the environment variables from
 # the .env file.
 
-load_dotenv()
+# load_dotenv()
 
-openai.api_key = os.environ['OPENAI_API_KEY']
+
+openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 app = Flask(__name__)
-app.config['MONGO_URI'] = f"mongodb+srv://maxpaulino:{os.environ['MONGO_PASSWORD']}@testify.mgathan.mongodb.net/Questions?retryWrites=true&w=majority"
+app.config['MONGO_URI'] = f"mongodb+srv://maxpaulino:{os.environ.get('MONGO_PASSWORD')}@testify.mgathan.mongodb.net/Questions?retryWrites=true&w=majority"
 mongo = PyMongo(app)
 
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)  
-app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
 jwt = JWTManager(app)
 
-def_username = os.environ['USERNAME']
-def_password = os.environ['PASSWORD']
+def_username = os.environ.get('USERNAME')
+def_password = os.environ.get('PASSWORD')
 
 # This is a Python function named `generate_mult_choice`. It takes in two 
 # arguments: `tag` which represents a string topic, and `level` which is a string 
