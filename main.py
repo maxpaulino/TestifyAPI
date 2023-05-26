@@ -62,6 +62,16 @@ def generate_mult_choice(tag, level):
 
     return completion.choices[0].message.content
 
+# This code defines a Flask route ("/") that returns a JSON
+# response with a message "Welcome to Tasks app!". It also gets
+# the hostname using the socket module.
+
+@app.route("/")
+def index():
+    return jsonify(
+        message="Welcome to Testify!"
+    )
+
 # This is a Flask route for user login authentication. The code receives a POST
 # request with username and password data in JSON format. If the credentials
 # are invalid, a 401 error is returned, otherwise, an access token is created
