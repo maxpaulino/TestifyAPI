@@ -13,7 +13,7 @@ RUN pip3 install -r requirements.txt
 # Specify the Flask environment port
 ENV PORT 5000
 
-# By default, listen on port 5000
+# By default, listen on port 80
 EXPOSE 80
 
 # Set the directive to specify the executable that will run when the container is initiated
