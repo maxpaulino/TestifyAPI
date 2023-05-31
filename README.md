@@ -1,110 +1,57 @@
-# Testify API
+# English Language Exam Question Generator
 
-This is a Flask-based API that generates multiple-choice questions and provides endpoints to manage and retrieve the questions. The questions are generated using OpenAI's GPT-3 language model.
+This application generates English Language Exam questions based on given topics and CEFR language level. The generated questions are in multiple-choice format. The questions are generated using the OpenAI GPT-3 model.
 
-## Setup
+The application is developed in Python using Flask, MongoDB, PyMongo, and OpenAI's GPT-3 model. It is Dockerized for easy setup and deployment.
 
-1. Clone the repository:
+### Features
 
-```bash
-git clone <repository-url>
-```
+- Generation of multiple-choice English Language Exam questions.
+- Questions can be added and retrieved from the MongoDB database.
+- Questions can be updated and deleted based on their ID.
+- All questions with the 'denied' status can be deleted at once.
 
-2. Install the dependencies:
+### Installation
 
-```bash
-pip install -r requirements.txt
-```
+Since the application is dockerized, the installation process is very straightforward.
 
-3. Create a .env file in the root directory and add the following environment
-   variables:
-
-```
-OPENAI_API_KEY=<your-openai-api-key>
-MONGO_URI=<your-mongodb-uri>
-JWT_SECRET_KEY=<your-jwt-secret-key>
-USERNAME=<your-username>
-PASSWORD=<your-password>
-```
-
-4. Start the Flask server:
+First, clone the repository:
 
 ```bash
-python app.py
+git clone https://github.com/maxpaulino/TestifyChat.git
+cd project
 ```
 
-5. The API will be accessible at http://localhost:5000.
-
-### Endpoints
-
-- `POST /login`: Authenticate and obtain an access token.
-
-- `GET /protected`: Protected endpoint that requires authentication.
-
-- `POST /questions`: Add a multiple-choice question to the database.
-
-- `GET /questions`: Get a collection of all questions in the database.
-
-- `GET /questions/<question_id>`: Get a question by its ID.
-
-- `DELETE /questions/<question_id>`: Delete a question by its ID.
-
-- `DELETE /questions/denied`: Delete all questions with the "denied" status.
-
-- `PUT /questions/<question_id>`: Update the status of a
-  question by its ID.
-
-### Usage
-
-1. Authenticate by sending a POST request to `/login` with the following JSON
-   payload:
-
-```json
-{
-  "username": "<your-username>",
-  "password": "<your-password>"
-}
-```
-
-The response will contain an access token that you can use for protected
-endpoints.
-
-2. Use the obtained access token in the Authorization header for protected
-   endpoints:
+Then, build the Docker image:
 
 ```bash
-GET /protected
-Authorization: Bearer <access-token>
+docker build -t english-question-generator .
 ```
 
-3. Add a multiple-choice question by sending a POST request to `/questions` with
-   the following JSON payload:
+And run the application:
 
-```json
-{
-  "tag": "<question-tag>",
-  "level": "<question-level>"
-}
+```bash
+docker run -p 5000:5000 english-question-generator
 ```
 
-The API will generate the question and store it in the database.
+The application will be available at `http://localhost:5000`.
 
-4. Retrieve all questions by sending a GET request to `/questions`.
+### Environment Variables
 
-5. Retrieve a specific question by sending a GET request to
-   `/questions/<question_id>`.
+The application uses the following environment variables:
 
-6. Delete a question by sending a DELETE request to `/questions/<question_id>`.
+- `OPENAI_API_KEY` - Your OpenAI API key.
+- `MONGO_PASSWORD` - The password for your MongoDB database.
 
-7. Delete all questions with the "denied" status by sending a DELETE request to
-   `/questions/denied`.
+These variables should be set in your environment or in a .env file.
 
-8. Update the status of a question by sending a PUT request to
-   `/questions/<question_id>` with the following JSON payload. You can
-   set the states to "approved" or "denied".
+### API Endpoints
 
-```json
-{
-  "status": "<denied||approved>"
-}
-```
+- `GET /.well-known/ai-plugin.json` - Serves the AI plugin JSON file.
+- `GET /.well-known/openapi.yaml` - Serves the OpenAPI YAML file.
+- `POST /questions - Generates` a question and adds it to the MongoDB database.
+- `GET /questions - Retrieves` all the questions from the MongoDB database.
+- `GET /questions/<question_id>` - Retrieves a question by its ID.
+- `DELETE /questions/<question_id>` - Deletes a question by its ID.
+- `DELETE /questions/denied` - Deletes all questions with the 'denied' status.
+- `PUT /questions/<question_id>` - Updates the status and revision of a question by its ID.
