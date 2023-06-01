@@ -49,8 +49,8 @@ These variables should be set in your environment or in a .env file.
 
 - `GET /.well-known/ai-plugin.json` - Serves the AI plugin JSON file.
 - `GET /.well-known/openapi.yaml` - Serves the OpenAPI YAML file.
-- `POST /questions - Generates` a question and adds it to the MongoDB database.
-- `GET /questions - Retrieves` all the questions from the MongoDB database.
+- `POST /questions` - Generates a question and adds it to the MongoDB database.
+- `GET /questions` - Retrieves all the questions from the MongoDB database.
 - `GET /questions/<question_id>` - Retrieves a question by its ID.
 - `DELETE /questions/<question_id>` - Deletes a question by its ID.
 - `DELETE /questions/denied` - Deletes all questions with the 'denied' status.
