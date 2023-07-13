@@ -14,7 +14,7 @@ RUN pip3 install -r requirements.txt
 ENV PORT 5000
 
 # By default, listen on port 80
-EXPOSE 80
+EXPOSE 5000
 
 # Set the directive to specify the executable that will run when the container is initiated
 ENTRYPOINT [ "python3" ]
