@@ -60,14 +60,14 @@ def generate_mult_choice(tag, level):
 
 @app.route('/.well-known/ai-plugin.json')
 def serve_manifest():
-    return send_from_directory(os.path.dirname(__file__), 'ai-plugin.json')
+    return send_from_directory(os.path.dirname(__file__), '/.well-known/ai-plugin.json')
 
 # This is a Flask route handler that serves an OpenAPI specification file in
 # YAML format. The file is read from the local directory, converted to a Python
 # dictionary using the PyYAML library, and then returned as a JSON response
 # using Flask's jsonify function.
 
-@app.route('/.well-known/openapi.yaml')
+@app.route('/openapi.yaml')
 def serve_openapi_yaml():
     with open(os.path.join(os.path.dirname(__file__), 'openapi.yaml'), 'r') as f:
         yaml_data = f.read()
