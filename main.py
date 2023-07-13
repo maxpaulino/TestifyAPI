@@ -13,7 +13,7 @@ from flask_cors import CORS
 # initialized for future use. Lastly it also loads the environment variables from
 # the .env file.
 
-PORT = 80
+PORT = 5000
 
 openai.api_key = os.environ.get('OPENAI_API_KEY')
 

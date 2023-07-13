@@ -4,7 +4,7 @@ info:
   description: An API for generating and managing multiple-choice questions
   version: 1.0.3
 servers:
-  - url: http://localhost:80
+  - url: http://localhost:5000
 paths:
   /questions:
     post:
