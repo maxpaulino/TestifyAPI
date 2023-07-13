@@ -60,7 +60,7 @@ def generate_mult_choice(tag, level):
 
 @app.route('/.well-known/ai-plugin.json')
 def serve_manifest():
-    return send_from_directory(os.path.dirname(__file__), '/ai-plugin.json')
+    return send_from_directory(os.path.dirname(__file__), 'ai-plugin.json')
 
 # This is a Flask route handler that serves an OpenAPI specification file in
 # YAML format. The file is read from the local directory, converted to a Python
@@ -73,6 +73,12 @@ def serve_openapi_yaml():
         yaml_data = f.read()
     yaml_data = yaml.load(yaml_data, Loader=yaml.FullLoader)
     return jsonify(yaml_data)
+
+# This function serves the logo
+
+@app.route('/logo.png')
+def serve_logo():
+    return send_from_directory(os.path.dirname(__file__), 'logo.png', mimetype='image/png')
 
 # This function is a Flask route that handles the addition of a multiple choice
 # question to a MongoDB database. It accepts a JSON request containing the tag

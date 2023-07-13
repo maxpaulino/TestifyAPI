@@ -1,7 +1,7 @@
 {
   "schema_version": "v1",
   "name_for_human": "Testify",
-  "name_for_model": "TestifyAPI Plugin",
+  "name_for_model": "TestifyAPI",
   "description_for_human": "Plugin for generating and revising exam questions",
   "description_for_model": "Use this tool to interact with exam questions inside a MongoDB database",
   "auth": {
@@ -13,5 +13,9 @@
     "has_user_authentication": false
 
   },
-  "contact_email": "max.paulino@alianzacapitales.com"
+  "contact_email": "max.paulino@alianzacapitales.com",
+  "legal_info_url": "http://www.example.com/legal",
+  "logo_url": "http://localhost:5000/logo.png"
+
+
 }

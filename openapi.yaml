@@ -8,6 +8,7 @@ servers:
 paths:
   /questions:
     post:
+      operationId: addQuestion
       summary: Add a multiple-choice question
       requestBody:
         required: true
@@ -34,6 +35,7 @@ paths:
                     type: string
                     example: Question added successfully
     get:
+      operationId: getAllQuestions
       summary: Get all questions
       responses:
         "200":
@@ -48,6 +50,7 @@ paths:
                     items:
                       $ref: "#/components/schemas/Question"
     delete:
+      operationId: deleteDeniedQuestions
       summary: Delete denied questions
       responses:
         "200":
@@ -62,6 +65,7 @@ paths:
                     example: "3 questions with status 'denied' deleted successfully."
   /questions/{question_id}:
     get:
+      operationId: getQuestion
       summary: Get a question by ID
       parameters:
         - in: path
@@ -88,6 +92,7 @@ paths:
                     type: string
                     example: Question not found.
     delete:
+      operationId: deleteQuestion
       summary: Delete a question by ID
       parameters:
         - in: path
@@ -118,6 +123,7 @@ paths:
                     type: string
                     example: Question not found.
     put:
+      operationId: setQuestion
       summary: Update a question by ID
       parameters:
         - in: path
