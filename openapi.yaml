@@ -184,6 +184,66 @@ put:
               message:
                 type: string
                 example: Question(s) not found.
+get:
+  operationId: getTags
+  summary: Get all tags
+  responses:
+    "200":
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tags:
+                type: array
+                items:
+                  type: string
+                example: ['tag1', 'tag2', 'tag3']
+    "404":
+      description: Tags not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Tags not found.
+    get:
+  operationId: getQuestionsByTags
+  summary: Get questions by tag
+  parameters:
+    - in: query
+      name: tag
+      required: true
+      schema:
+        type: string
+      description: The tag to filter questions by
+  responses:
+    "200":
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tags:
+                type: array
+                items:
+                  type: string
+                example: ['tag1', 'tag2', 'tag3']
+    "404":
+      description: Questions not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Questions not found.
+
 components:
   schemas:
     Question:
