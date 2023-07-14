@@ -152,6 +152,25 @@ def get_tags():
 
 
 
+@app.route('/questions', methods=['GET'])
+def get_questions():
+    tag = request.json['tag']
+
+    questions = []
+
+    for question in mycol.find({"tag": tag}):
+        questions.append({
+            'id': str(question['_id']),
+            'tag': question['tag'],
+            'level': question['level'],
+            'question': question['question'],
+            'choices': question['choices'],
+            'answer': question['answer'],
+            'status': question['status'],
+            'revised': question['revised']
+        })
+
+    return jsonify({'questions': questions}), 200
 
 
 
