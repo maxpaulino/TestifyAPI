@@ -129,9 +129,9 @@ def add_question():
     try:
         questions_collection.insert_one(question_data)
     except Exception as e:
-        return {'error': str(e)}
+        return jsonify({'error': str(e)}), 404
 
-    return {'message': 'Question added successfully'}
+    return jsonify({'message': 'Question added successfully'}), 200
 
 # This is a Flask route function that handles a GET request for a collection of
 # questions from a MongoDB database. The function creates a list of dictionaries
@@ -156,7 +156,7 @@ def get_questions():
             'revised': question['revised']
         })
 
-    return {'questions': questions}
+    return jsonify({'questions': questions}), 200
 
 # This function takes in a `question_id` parameter in the URL and attempts to
 # retrieve the corresponding question from the MongoDB database. If found, the
@@ -171,7 +171,7 @@ def get_question_by_id(question_id):
     question = questions_collection.find_one({'_id': ObjectId(question_id)})
     
     if question:
-        return {
+        return jsonify({
             'id': str(question['_id']),
             'tag': question['tag'],
             'level': question['level'],
@@ -180,9 +180,9 @@ def get_question_by_id(question_id):
             'answer': question['answer'],
             'status': question['status'],
             'revised': question['revised']
-        }
+        }), 200
     else:
-        return {'message': 'Question not found.'}, 404
+        return jsonify({'message': 'Question not found.'}), 404
 
 # This function deletes a question from the MongoDB database by its ID.
 # It takes in a question_id parameter and uses it to query the questions 
@@ -198,9 +198,9 @@ def delete_question_by_id(question_id):
     result = questions_collection.delete_one({'_id': ObjectId(question_id)})
 
     if result.deleted_count > 0:
-        return {'message': 'Question deleted successfully.'}
+        return jsonify({'message': 'Question deleted successfully.'}), 200
     else:
-        return {'message': 'Question not found.'}, 404
+        return jsonify({'message': 'Question not found.'}), 404
 
 # This function is a Flask route that accepts DELETE requests at the endpoint 
 # '/questions/denied'. It first accesses the 'questions' collection in the 
@@ -215,7 +215,7 @@ def delete_denied_questions():
     questions_collection = mongo.db.mc_questions
     result = questions_collection.delete_many({'status': 'denied'})
 
-    return {'message': f'{result.deleted_count} questions with status "denied" deleted successfully.'}
+    return jsonify({'message': f'{result.deleted_count} questions with status "denied" deleted successfully.'}), 200
 
 # This code defines a Flask route that handles PUT requests to update a question
 # in a MongoDB database. The route first retrieves the question with the given
@@ -241,9 +241,9 @@ def update_question_by_id(question_id):
             {'$set': {'status': status, 
                       'revised': revised}}
         )
-        return {'message': 'Question updated successfully.'}, 200
+        return jsonify({'message': 'Question updated successfully.'}), 200
     else:
-        return {'message': 'Question not found.'}, 404
+        return jsonify({'message': 'Question not found.'}), 404
 
 # Main function
 
