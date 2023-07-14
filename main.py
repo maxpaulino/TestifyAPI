@@ -21,7 +21,7 @@ app = Flask(__name__)
 CORS(app, origins=[f"http://localhost:{PORT}", "https://chat.openai.com"])
 app.config['MONGO_URI'] = f"mongodb+srv://maxipaulino:{os.environ.get('MONGO_PASSWORD')}@cluster0.ibeupug.mongodb.net/Testify?retryWrites=true&w=majority"
 myclient = PyMongo(app)
-mycol = myclient.db.questions
+mycol = myclient.db.Questions
 
 
 
@@ -93,47 +93,51 @@ def serve_logo():
 
 @app.route('/questions', methods=['POST'])
 def add_question():
-
     data = request.json
     tag = data['tag']
     level = data['level']
+    number = data['number']  # New JSON argument for the number of questions
 
-    if not tag or not level:
+    if not tag or not level or not number:
         return {'error': 'Invalid input data'}
 
-    prompt_list = []
+    questions_added = 0
 
-    ready = False
+    while questions_added < number:
+        prompt_list = []
 
-    while ready == False:
-        prompt_list = generate_mult_choice(tag,level).split('\n\n')
-        if len(prompt_list) == 3:
-            if len(prompt_list[2]) != 4:
-                ready = True
+        ready = False
 
-    question = prompt_list[0][3:]
-    choices = prompt_list[1].split('\n')
-    answer = prompt_list[2][3:]
+        while ready == False:
+            prompt_list = generate_mult_choice(tag, level).split('\n\n')
+            if len(prompt_list) == 3:
+                if len(prompt_list[2]) != 4:
+                    ready = True
 
-    if answer.startswith('wer: '):
-        answer = prompt_list[2][8:]
+        question = prompt_list[0][3:]
+        choices = prompt_list[1].split('\n')
+        answer = prompt_list[2][3:]
 
-    question_data = {
-        'tag': tag,
-        'level': level,
-        'question': question,
-        'choices': choices,
-        'answer': answer,
-        'status': "pending",
-        'revised': False
-    }
+        if answer.startswith('wer: '):
+            answer = prompt_list[2][8:]
 
-    try:
-        mycol.insert_one(question_data)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 404
+        question_data = {
+            'tag': tag,
+            'level': level,
+            'question': question,
+            'choices': choices,
+            'answer': answer,
+            'status': "pending",
+            'revised': False
+        }
 
-    return jsonify({'message': 'Question added successfully'}), 200
+        try:
+            mycol.insert_one(question_data)
+            questions_added += 1
+        except Exception as e:
+            return jsonify({'error': str(e)}), 404
+
+    return jsonify({'message': f'{number} questions added successfully'}), 200
 
 # This is a Flask route function that handles a GET request for a collection of
 # questions from a MongoDB database. The function creates a list of dictionaries
