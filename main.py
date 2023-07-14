@@ -19,10 +19,10 @@ openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 app = Flask(__name__)
 CORS(app, origins=[f"http://localhost:{PORT}", "https://chat.openai.com"])
-app.config['MONGO_URI'] = f"mongodb+srv://maxipaulino:{os.environ.get('MONGO_PASSWORD')}@cluster0.ibeupug.mongodb.net/?retryWrites=true&w=majority"
+app.config['MONGO_URI'] = f"mongodb+srv://maxipaulino:{os.environ.get('MONGO_PASSWORD')}@cluster0.ibeupug.mongodb.net/Testify?retryWrites=true&w=majority"
 myclient = PyMongo(app)
-mydb = myclient["Testify"]
-mycol = mydb["Questions"]
+mycol = myclient.db.questions
+
 
 
 # This is a Python function named `generate_mult_choice`. It takes in two 
