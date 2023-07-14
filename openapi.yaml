@@ -38,6 +38,7 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Question"
+  /questions/denied:
     delete:
       operationId: deleteDeniedQuestions
       summary: Delete denied questions
@@ -48,6 +49,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
+  /questions/id:
     get:
       operationId: getQuestions
       summary: Get multiple questions by IDs
@@ -153,39 +155,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
- /questions/tag:
-  post:
-    operationId: getQuestionsByTags
-    summary: Get questions by tag
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              tag:
-                type: string
-                description: The tag to filter questions by
-    responses:
-      "200":
-        description: Successful response
+  /questions/tag:
+    get:
+      operationId: getQuestionsByTags
+      summary: Get questions by tag
+      requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                questions:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/Question'
-      "404":
-        description: Questions not found
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Message'
-
+                tag:
+                  type: string
+                  description: The tag to filter questions by
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  questions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Question'
+        "404":
+          description: Questions not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
 components:
   schemas:
     Question:
