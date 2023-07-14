@@ -268,24 +268,31 @@ def delete_denied_questions():
 # question is not found, it returns a "not found" message with a 404 status code. 
 # Overall, this code provides a RESTful endpoint for updating question data.
 
-@app.route('/questions/<question_id>', methods=['PUT'])
-def update_question_by_id(question_id):
+@app.route('/questions', methods=['PUT'])
+def update_questions_by_ids():
+    data = request.json
+    question_ids = data['question_ids']
 
-    question = mycol.find_one({'_id': ObjectId(question_id)})
+    updated_count = 0
 
-    if question:
-        data = request.json
-        status = data['status']
-        revised = True
+    for question_id in question_ids:
+        question = mycol.find_one({'_id': ObjectId(question_id)})
+        if question:
+            status = data['status']
+            revised = True
 
-        mycol.update_one(
-            {'_id': ObjectId(question_id)}, 
-            {'$set': {'status': status, 
-                      'revised': revised}}
-        )
-        return jsonify({'message': 'Question updated successfully.'}), 200
+            mycol.update_one(
+                {'_id': ObjectId(question_id)}, 
+                {'$set': {'status': status, 
+                          'revised': revised}}
+            )
+            updated_count += 1
+
+    if updated_count > 0:
+        return jsonify({'message': f'{updated_count} question(s) updated successfully.'}), 200
     else:
-        return jsonify({'message': 'Question not found.'}), 404
+        return jsonify({'message': 'No questions found.'}), 404
+
 
 # Main function
 
