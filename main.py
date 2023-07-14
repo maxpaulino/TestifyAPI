@@ -150,6 +150,48 @@ def get_tags():
     except Exception as e:
         return jsonify("Error retrieving tags."), 400
 
+# This is a Flask route function that handles a GET request for a collection of
+# questions from a MongoDB database. The function creates a list of dictionaries
+# containing the relevant fields for each question and returns it as a JSON 
+# object. 
+
+@app.route('/questions', methods=['GET'])
+def get_questions():
+
+    questions = []
+
+    for question in mycol.find():
+        questions.append({
+            'id': str(question['_id']),
+            'tag': question['tag'],
+            'level': question['level'],
+            'question': question['question'],
+            'choices': question['choices'],
+            'answer': question['answer'],
+            'status': question['status'],
+            'revised': question['revised']
+        })
+
+    return jsonify({'questions': questions}), 200
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route('/questions/tag', methods=['GET'])
@@ -175,29 +217,6 @@ def get_questions_by_tag():
 
 
 
-# This is a Flask route function that handles a GET request for a collection of
-# questions from a MongoDB database. The function creates a list of dictionaries
-# containing the relevant fields for each question and returns it as a JSON 
-# object. 
-
-@app.route('/questions', methods=['GET'])
-def get_questions():
-
-    questions = []
-
-    for question in mycol.find():
-        questions.append({
-            'id': str(question['_id']),
-            'tag': question['tag'],
-            'level': question['level'],
-            'question': question['question'],
-            'choices': question['choices'],
-            'answer': question['answer'],
-            'status': question['status'],
-            'revised': question['revised']
-        })
-
-    return jsonify({'questions': questions}), 200
 
 # This function takes in a `question_id` parameter in the URL and attempts to
 # retrieve the corresponding question from the MongoDB database. If found, the
@@ -206,7 +225,7 @@ def get_questions():
 # returned instead.
 
 
-@app.route('/questions', methods=['GET'])
+@app.route('/questions/id', methods=['GET'])
 def get_question_by_id():
     question_ids = request.args.getlist('id')
 
@@ -236,7 +255,7 @@ def get_question_by_id():
 # the question is not found, it returns a JSON object with the message 
 # "Question not found" and a 404 status code.
 
-@app.route('/questions', methods=['DELETE'])
+@app.route('/questions/id', methods=['DELETE'])
 def delete_question_by_id():
     data = request.get_json()
     question_ids = data.get('question_ids')
@@ -273,7 +292,7 @@ def delete_denied_questions():
 # question is not found, it returns a "not found" message with a 404 status code. 
 # Overall, this code provides a RESTful endpoint for updating question data.
 
-@app.route('/questions', methods=['PUT'])
+@app.route('/questions/id', methods=['PUT'])
 def update_questions_by_ids():
     data = request.json
     question_ids = data['question_ids']
