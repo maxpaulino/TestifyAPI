@@ -125,7 +125,7 @@ def add_question():
         'revised': False
     }
 
-    questions_collection = mongo.db.mc_questions
+    questions_collection = mongo.db.Questions
     try:
         questions_collection.insert_one(question_data)
     except Exception as e:
@@ -141,7 +141,7 @@ def add_question():
 @app.route('/questions', methods=['GET'])
 def get_questions():
 
-    questions_collection = mongo.db.mc_questions
+    questions_collection = mongo.db.Questions
     questions = []
 
     for question in questions_collection.find():
@@ -167,7 +167,7 @@ def get_questions():
 @app.route('/questions/<question_id>', methods=['GET'])
 def get_question_by_id(question_id):
 
-    questions_collection = mongo.db.mc_questions
+    questions_collection = mongo.db.Questions
     question = questions_collection.find_one({'_id': ObjectId(question_id)})
     
     if question:
@@ -194,7 +194,7 @@ def get_question_by_id(question_id):
 @app.route('/questions/<question_id>', methods=['DELETE'])
 def delete_question_by_id(question_id):
 
-    questions_collection = mongo.db.mc_questions
+    questions_collection = mongo.db.Questions
     result = questions_collection.delete_one({'_id': ObjectId(question_id)})
 
     if result.deleted_count > 0:
@@ -212,7 +212,7 @@ def delete_question_by_id(question_id):
 @app.route('/questions/denied', methods=['DELETE'])
 def delete_denied_questions():
 
-    questions_collection = mongo.db.mc_questions
+    questions_collection = mongo.db.Questions
     result = questions_collection.delete_many({'status': 'denied'})
 
     return jsonify({'message': f'{result.deleted_count} questions with status "denied" deleted successfully.'}), 200
@@ -228,7 +228,7 @@ def delete_denied_questions():
 @app.route('/questions/<question_id>', methods=['PUT'])
 def update_question_by_id(question_id):
 
-    questions_collection = mongo.db.mc_questions
+    questions_collection = mongo.db.Questions
     question = questions_collection.find_one({'_id': ObjectId(question_id)})
 
     if question:
