@@ -153,7 +153,7 @@ def get_tags():
 
 
 @app.route('/questions', methods=['GET'])
-def get_questions():
+def get_questions_by_tag():
     tag = request.json['tag']
 
     questions = []
