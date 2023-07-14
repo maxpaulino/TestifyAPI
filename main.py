@@ -225,29 +225,34 @@ def get_questions_by_tag():
 # returned instead.
 
 
-@app.route('/questions/id', methods=['GET'])
-def get_question_by_id():
-    question_ids = request.args.getlist('id')
+@app.route('/questions', methods=['POST'])
+def get_questions_by_ids():
+    question_ids = request.json.get('question_ids', [])  # Assuming question IDs are passed in the request body as a JSON array
+
+    if not question_ids:
+        return jsonify({'message': 'No question IDs provided.'}), 400
 
     questions = mycol.find({'_id': {'$in': [ObjectId(q_id) for q_id in question_ids]}})
-    
-    if questions:
-        result = []
-        for question in questions:
-            result.append({
-                'id': str(question['_id']),
-                'tag': question['tag'],
-                'level': question['level'],
-                'question': question['question'],
-                'choices': question['choices'],
-                'answer': question['answer'],
-                'status': question['status'],
-                'revised': question['revised']
-            })
+
+    result = []
+    for question in questions:
+        result.append({
+            'id': str(question['_id']),
+            'tag': question['tag'],
+            'level': question['level'],
+            'question': question['question'],
+            'choices': question['choices'],
+            'answer': question['answer'],
+            'status': question['status'],
+            'revised': question['revised']
+        })
+
+    if result:
         return jsonify(result), 200
     else:
         return jsonify({'message': 'No questions found.'}), 404
 
+        
 # This function deletes a question from the MongoDB database by its ID.
 # It takes in a question_id parameter and uses it to query the questions 
 # collection in the database. If the question is found and successfully deleted, 

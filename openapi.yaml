@@ -50,7 +50,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Message'
   /questions/id:
-    get:
+    post:
       operationId: getQuestions
       summary: Get multiple questions by IDs
       requestBody:
