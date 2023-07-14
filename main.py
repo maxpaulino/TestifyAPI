@@ -139,6 +139,23 @@ def add_question():
 
     return jsonify({'message': f'{number} questions added successfully'}), 200
 
+
+
+
+@app.route('/questions', methods=['GET'])
+def get_tags():
+    try: 
+        tags = mycol.distinct("tag")
+        return jsonify(", ".join(tags)), 200  # Join the tags using a comma and space
+    except Exception as e:
+        return jsonify("Error retrieving tags."), 400
+
+
+
+
+
+
+
 # This is a Flask route function that handles a GET request for a collection of
 # questions from a MongoDB database. The function creates a list of dictionaries
 # containing the relevant fields for each question and returns it as a JSON 
