@@ -20,7 +20,10 @@ openai.api_key = os.environ.get('OPENAI_API_KEY')
 app = Flask(__name__)
 CORS(app, origins=[f"http://localhost:{PORT}", "https://chat.openai.com"])
 app.config['MONGO_URI'] = f"mongodb+srv://maxipaulino:{os.environ.get('MONGO_PASSWORD')}@cluster0.ibeupug.mongodb.net/?retryWrites=true&w=majority"
-mongo = PyMongo(app)
+myclient = PyMongo(app)
+mydb = myclient["Testify"]
+mycol = mydb["Questions"]
+
 
 # This is a Python function named `generate_mult_choice`. It takes in two 
 # arguments: `tag` which represents a string topic, and `level` which is a string 
@@ -125,9 +128,8 @@ def add_question():
         'revised': False
     }
 
-    questions_collection = mongo.db.Questions
     try:
-        questions_collection.insert_one(question_data)
+        mycol.insert_one(question_data)
     except Exception as e:
         return jsonify({'error': str(e)}), 404
 
@@ -141,10 +143,9 @@ def add_question():
 @app.route('/questions', methods=['GET'])
 def get_questions():
 
-    questions_collection = mongo.db.Questions
     questions = []
 
-    for question in questions_collection.find():
+    for question in mycol.find():
         questions.append({
             'id': str(question['_id']),
             'tag': question['tag'],
@@ -167,8 +168,7 @@ def get_questions():
 @app.route('/questions/<question_id>', methods=['GET'])
 def get_question_by_id(question_id):
 
-    questions_collection = mongo.db.Questions
-    question = questions_collection.find_one({'_id': ObjectId(question_id)})
+    question = mycol.find_one({'_id': ObjectId(question_id)})
     
     if question:
         return jsonify({
@@ -194,8 +194,7 @@ def get_question_by_id(question_id):
 @app.route('/questions/<question_id>', methods=['DELETE'])
 def delete_question_by_id(question_id):
 
-    questions_collection = mongo.db.Questions
-    result = questions_collection.delete_one({'_id': ObjectId(question_id)})
+    result = mycol.delete_one({'_id': ObjectId(question_id)})
 
     if result.deleted_count > 0:
         return jsonify({'message': 'Question deleted successfully.'}), 200
@@ -212,8 +211,7 @@ def delete_question_by_id(question_id):
 @app.route('/questions/denied', methods=['DELETE'])
 def delete_denied_questions():
 
-    questions_collection = mongo.db.Questions
-    result = questions_collection.delete_many({'status': 'denied'})
+    result = mycol.delete_many({'status': 'denied'})
 
     return jsonify({'message': f'{result.deleted_count} questions with status "denied" deleted successfully.'}), 200
 
@@ -228,15 +226,14 @@ def delete_denied_questions():
 @app.route('/questions/<question_id>', methods=['PUT'])
 def update_question_by_id(question_id):
 
-    questions_collection = mongo.db.Questions
-    question = questions_collection.find_one({'_id': ObjectId(question_id)})
+    question = mycol.find_one({'_id': ObjectId(question_id)})
 
     if question:
         data = request.json
         status = data['status']
         revised = True
 
-        questions_collection.update_one(
+        mycol.update_one(
             {'_id': ObjectId(question_id)}, 
             {'$set': {'status': status, 
                       'revised': revised}}
