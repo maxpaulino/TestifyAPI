@@ -15,28 +15,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                tag:
-                  type: string
-                  example: Science
-                level:
-                  type: string
-                  example: B2
-                number:
-                  type: integer
-                  example: 2
+              $ref: '#/components/schemas/QuestionInput'
       responses:
         "200":
           description: Question added successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Question added successfully
+                $ref: '#/components/schemas/Message'
     get:
       operationId: getAllQuestions
       summary: Get all questions
@@ -61,203 +47,206 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "3 questions with status 'denied' deleted successfully."
+                $ref: '#/components/schemas/Message'
+  /questions/{question_id}:
     get:
       operationId: getQuestion
       summary: Get question(s) by ID
       parameters:
-    - in: query
-      name: question_id
-      required: true
-      style: form
-      schema:
-        type: array
-        items:
-          type: string
-      explode: true
-      description: The ID(s) of the question(s)
-    responses:
-      "200":
-      description: Successful operation
-      content:
-        application/json:
+        - in: path
+          name: question_id
+          required: true
           schema:
-            type: object
-            properties:
-              questions:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Question"
-      "404":
-      description: Question(s) not found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: Question(s) not found.
+            type: string
+          description: The ID of the question
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        "404":
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
     delete:
-  operationId: deleteQuestion
-  summary: Delete one or more questions by ID
-  parameters:
-    - in: body
-      name: question_ids
-      required: true
-      schema:
-        type: array
-        items:
-          type: string
-      description: The IDs of the questions to delete
-  responses:
-    "200":
-      description: Questions deleted successfully
-      content:
-        application/json:
+      operationId: deleteQuestion
+      summary: Delete a question by ID
+      parameters:
+        - in: path
+          name: question_id
+          required: true
           schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: Questions deleted successfully.
-    "404":
-      description: Question(s) not found
-      content:
-        application/json:
+            type: string
+          description: The ID of the question to delete
+      responses:
+        "200":
+          description: Question deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "404":
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    put:
+      operationId: setQuestion
+      summary: Update a question by ID
+      parameters:
+        - in: path
+          name: question_id
+          required: true
           schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: Question(s) not found.
-put:
-  operationId: setQuestion
-  summary: Update one or more questions by ID
-  parameters:
-    - in: body
-      name: question_ids
-      required: true
-      schema:
-        type: array
-        items:
-          type: string
-      description: The IDs of the questions to update
-    - in: path
-      name: question_id
-      required: false
-      schema:
-        type: string
-      description: The ID of a single question to update
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          type: object
-          properties:
-            status:
-              type: string
-              example: approved
-  responses:
-    "200":
-      description: Questions updated successfully
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: Questions updated successfully.
-    "404":
-      description: Question(s) not found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: Question(s) not found.
-get:
-  operationId: getTags
-  summary: Get all tags
-  responses:
-    "200":
-      description: Successful response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              tags:
-                type: array
-                items:
-                  type: string
-                example: ['tag1', 'tag2', 'tag3']
-    "404":
-      description: Tags not found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: Tags not found.
+            type: string
+          description: The ID of the question to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionInput'
+      responses:
+        "200":
+          description: Question updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "404":
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /tags:
     get:
-  operationId: getQuestionsByTags
-  summary: Get questions by tag
-  parameters:
-    - in: query
-      name: tag
-      required: true
-      schema:
-        type: string
-      description: The tag to filter questions by
-  responses:
-    "200":
-      description: Successful response
-      content:
-        application/json:
+      operationId: getTags
+      summary: Get all tags
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                    example: ['tag1', 'tag2', 'tag3']
+        "404":
+          description: Tags not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /questions/tag/{tag}:
+    get:
+      operationId: getQuestionsByTags
+      summary: Get questions by tag
+      parameters:
+        - in: path
+          name: tag
+          required: true
           schema:
-            type: object
-            properties:
-              tags:
-                type: array
-                items:
-                  type: string
-                example: ['tag1', 'tag2', 'tag3']
-    "404":
-      description: Questions not found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: Questions not found.
-
+            type: string
+          description: The tag to filter questions by
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  questions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Question'
+        "404":
+          description: Questions not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
 components:
   schemas:
     Question:
       type: object
+      required:
+        - _id
+        - tag
+        - level
+        - prompt
+        - status
+        - revised
       properties:
         _id:
           type: string
+          description: The unique identifier for the question
+          example: "5f2b39035b71272a7b2c5d2e"
         tag:
           type: string
+          description: The category or topic of the question
+          example: "Science"
         level:
           type: string
+          description: The difficulty level of the question
+          example: "B2"
         prompt:
           type: string
+          description: The question text
+          example: "What is the chemical symbol for Hydrogen?"
         status:
           type: string
+          description: The status of the question (e.g., approved, denied, pending)
+          example: "approved"
         revised:
           type: boolean
+          description: Indicates whether the question has been revised
+          example: false
+    QuestionInput:
+      type: object
+      required:
+        - tag
+        - level
+        - prompt
+        - status
+        - revised
+      properties:
+        tag:
+          type: string
+          description: The category or topic of the question
+          example: "Science"
+        level:
+          type: string
+          description: The difficulty level of the question
+          example: "B2"
+        prompt:
+          type: string
+          description: The question text
+          example: "What is the chemical symbol for Hydrogen?"
+        status:
+          type: string
+          description: The status of the question (e.g., approved, denied, pending)
+          example: "approved"
+        revised:
+          type: boolean
+          description: Indicates whether the question has been revised
+          example: false
+    Message:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: A message about the result of the operation
+          example: "Question added successfully"
