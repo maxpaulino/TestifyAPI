@@ -142,7 +142,7 @@ def add_question():
 
 
 
-@app.route('/questions', methods=['GET'])
+@app.route('/tags', methods=['GET'])
 def get_tags():
     try: 
         tags = mycol.distinct("tag")
@@ -186,24 +186,29 @@ def get_questions():
 # `get_questions` handler. If the question is not found, a 404 error message is 
 # returned instead.
 
-@app.route('/questions/<question_id>', methods=['GET'])
-def get_question_by_id(question_id):
 
-    question = mycol.find_one({'_id': ObjectId(question_id)})
+@app.route('/questions', methods=['GET'])
+def get_question_by_id():
+    question_ids = request.args.getlist('id')
+
+    questions = mycol.find({'_id': {'$in': [ObjectId(q_id) for q_id in question_ids]}})
     
-    if question:
-        return jsonify({
-            'id': str(question['_id']),
-            'tag': question['tag'],
-            'level': question['level'],
-            'question': question['question'],
-            'choices': question['choices'],
-            'answer': question['answer'],
-            'status': question['status'],
-            'revised': question['revised']
-        }), 200
+    if questions:
+        result = []
+        for question in questions:
+            result.append({
+                'id': str(question['_id']),
+                'tag': question['tag'],
+                'level': question['level'],
+                'question': question['question'],
+                'choices': question['choices'],
+                'answer': question['answer'],
+                'status': question['status'],
+                'revised': question['revised']
+            })
+        return jsonify(result), 200
     else:
-        return jsonify({'message': 'Question not found.'}), 404
+        return jsonify({'message': 'No questions found.'}), 404
 
 # This function deletes a question from the MongoDB database by its ID.
 # It takes in a question_id parameter and uses it to query the questions 
