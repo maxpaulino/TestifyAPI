@@ -236,15 +236,20 @@ def get_question_by_id():
 # the question is not found, it returns a JSON object with the message 
 # "Question not found" and a 404 status code.
 
-@app.route('/questions/<question_id>', methods=['DELETE'])
-def delete_question_by_id(question_id):
+@app.route('/questions', methods=['DELETE'])
+def delete_question_by_id():
+    data = request.get_json()
+    question_ids = data.get('question_ids')
 
-    result = mycol.delete_one({'_id': ObjectId(question_id)})
+    if not question_ids:
+        return jsonify({'message': 'Question IDs not provided.'}), 400
 
-    if result.deleted_count > 0:
-        return jsonify({'message': 'Question deleted successfully.'}), 200
+    deleted_count = mycol.delete_many({'_id': {'$in': [ObjectId(id) for id in question_ids]}}).deleted_count
+
+    if deleted_count > 0:
+        return jsonify({'message': 'Questions deleted successfully.'}), 200
     else:
-        return jsonify({'message': 'Question not found.'}), 404
+        return jsonify({'message': 'Questions not found.'}), 404
 
 # This function is a Flask route that accepts DELETE requests at the endpoint 
 # '/questions/denied'. It first accesses the 'questions' collection in the 
