@@ -23,6 +23,9 @@ paths:
                 level:
                   type: string
                   example: B2
+                number:
+                  type: integer
+                  example: 2
       responses:
         "200":
           description: Question added successfully
@@ -63,106 +66,124 @@ paths:
                   message:
                     type: string
                     example: "3 questions with status 'denied' deleted successfully."
-  /questions/{question_id}:
     get:
       operationId: getQuestion
-      summary: Get a question by ID
+      summary: Get question(s) by ID
       parameters:
-        - in: path
-          name: question_id
-          required: true
+    - in: query
+      name: question_id
+      required: true
+      style: form
+      schema:
+        type: array
+        items:
+          type: string
+      explode: true
+      description: The ID(s) of the question(s)
+    responses:
+      "200":
+      description: Successful operation
+      content:
+        application/json:
           schema:
-            type: string
-          description: The ID of the question
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Question"
-        "404":
-          description: Question not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Question not found.
+            type: object
+            properties:
+              questions:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Question"
+      "404":
+      description: Question(s) not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Question(s) not found.
     delete:
-      operationId: deleteQuestion
-      summary: Delete a question by ID
-      parameters:
-        - in: path
-          name: question_id
-          required: true
+  operationId: deleteQuestion
+  summary: Delete one or more questions by ID
+  parameters:
+    - in: body
+      name: question_ids
+      required: true
+      schema:
+        type: array
+        items:
+          type: string
+      description: The IDs of the questions to delete
+  responses:
+    "200":
+      description: Questions deleted successfully
+      content:
+        application/json:
           schema:
-            type: string
-          description: The ID of the question
-      responses:
-        "200":
-          description: Question deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Question deleted successfully.
-        "404":
-          description: Question not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Question not found.
-    put:
-      operationId: setQuestion
-      summary: Update a question by ID
-      parameters:
-        - in: path
-          name: question_id
-          required: true
+            type: object
+            properties:
+              message:
+                type: string
+                example: Questions deleted successfully.
+    "404":
+      description: Question(s) not found
+      content:
+        application/json:
           schema:
-            type: string
-          description: The ID of the question
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                status:
-                  type: string
-                  example: approved
-      responses:
-        "200":
-          description: Question updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Question updated successfully.
-        "404":
-          description: Question not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Question not found.
+            type: object
+            properties:
+              message:
+                type: string
+                example: Question(s) not found.
+put:
+  operationId: setQuestion
+  summary: Update one or more questions by ID
+  parameters:
+    - in: body
+      name: question_ids
+      required: true
+      schema:
+        type: array
+        items:
+          type: string
+      description: The IDs of the questions to update
+    - in: path
+      name: question_id
+      required: false
+      schema:
+        type: string
+      description: The ID of a single question to update
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+              example: approved
+  responses:
+    "200":
+      description: Questions updated successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Questions updated successfully.
+    "404":
+      description: Question(s) not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Question(s) not found.
 components:
   schemas:
     Question:
