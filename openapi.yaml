@@ -48,78 +48,84 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
-  /questions/{question_id}:
     get:
-      operationId: getQuestion
-      summary: Get question(s) by ID
-      parameters:
-        - in: path
-          name: question_id
-          required: true
-          schema:
-            type: string
-          description: The ID of the question
+      operationId: getQuestions
+      summary: Get multiple questions by IDs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: The IDs of the questions
       responses:
         "200":
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Question'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Question'
         "404":
-          description: Question not found
+          description: Questions not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
     delete:
-      operationId: deleteQuestion
-      summary: Delete a question by ID
-      parameters:
-        - in: path
-          name: question_id
-          required: true
-          schema:
-            type: string
-          description: The ID of the question to delete
-      responses:
-        "200":
-          description: Question deleted successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-        "404":
-          description: Question not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-    put:
-      operationId: setQuestion
-      summary: Update a question by ID
-      parameters:
-        - in: path
-          name: question_id
-          required: true
-          schema:
-            type: string
-          description: The ID of the question to update
+      operationId: deleteQuestions
+      summary: Delete multiple questions by IDs
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QuestionInput'
+              type: object
+              properties:
+                question_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: The IDs of the questions to delete
       responses:
         "200":
-          description: Question updated successfully
+          description: Questions deleted successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
         "404":
-          description: Question not found
+          description: Questions not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    put:
+      operationId: setQuestions
+      summary: Update multiple questions by IDs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/QuestionInput'
+      responses:
+        "200":
+          description: Questions updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "404":
+          description: Questions not found
           content:
             application/json:
               schema:
@@ -147,35 +153,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
-  /questions/tag/{tag}:
-    get:
-      operationId: getQuestionsByTags
-      summary: Get questions by tag
-      parameters:
-        - in: path
-          name: tag
-          required: true
+ /questions/tag:
+  post:
+    operationId: getQuestionsByTags
+    summary: Get questions by tag
+    requestBody:
+      required: true
+      content:
+        application/json:
           schema:
-            type: string
-          description: The tag to filter questions by
-      responses:
-        "200":
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  questions:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Question'
-        "404":
-          description: Questions not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
+            type: object
+            properties:
+              tag:
+                type: string
+                description: The tag to filter questions by
+    responses:
+      "200":
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                questions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Question'
+      "404":
+        description: Questions not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+
 components:
   schemas:
     Question:
@@ -217,9 +227,7 @@ components:
       required:
         - tag
         - level
-        - prompt
-        - status
-        - revised
+        - number
       properties:
         tag:
           type: string
@@ -229,18 +237,11 @@ components:
           type: string
           description: The difficulty level of the question
           example: "B2"
-        prompt:
-          type: string
-          description: The question text
-          example: "What is the chemical symbol for Hydrogen?"
-        status:
-          type: string
-          description: The status of the question (e.g., approved, denied, pending)
-          example: "approved"
-        revised:
-          type: boolean
-          description: Indicates whether the question has been revised
-          example: false
+        number:
+          type: integer
+          description: The number of questions
+          example: "2"
+
     Message:
       type: object
       required:
