@@ -116,9 +116,19 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/QuestionInput'
+              type: object
+              properties:
+                questionIds:
+                  type: array
+                  items:
+                    type: string
+                  description: List of question IDs to update
+                status:
+                  type: string
+                  enum:
+                    - approved
+                    - denied
+                  description: Status to assign to the questions
       responses:
         "200":
           description: Questions updated successfully
@@ -156,7 +166,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Message'
   /questions/tag:
-    get:
+    post:
       operationId: getQuestionsByTags
       summary: Get questions by tag
       requestBody:

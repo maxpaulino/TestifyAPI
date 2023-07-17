@@ -174,29 +174,10 @@ def get_questions():
 
     return jsonify({'questions': questions}), 200
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@app.route('/questions/tag', methods=['GET'])
+@app.route('/questions/tag', methods=['POST'])
 def get_questions_by_tag():
-    tag = request.args.get('tag')
+    data = request.json
+    tag = data['tag']
 
     if tag is None:
         return jsonify({'error': 'Tag parameter is missing.'}), 400
@@ -226,6 +207,38 @@ def get_questions_by_tag():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # This function takes in a `question_id` parameter in the URL and attempts to
 # retrieve the corresponding question from the MongoDB database. If found, the
 # question data is returned in a JSON format similar to the original 
@@ -233,9 +246,10 @@ def get_questions_by_tag():
 # returned instead.
 
 
-@app.route('/questions', methods=['POST'])
+@app.route('/questions/id', methods=['POST'])
 def get_questions_by_ids():
-    question_ids = request.json.get('question_ids', [])  # Assuming question IDs are passed in the request body as a JSON array
+    data = request.json
+    question_ids = data['question_ids']
 
     if not question_ids:
         return jsonify({'message': 'No question IDs provided.'}), 400
