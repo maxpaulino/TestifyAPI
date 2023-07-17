@@ -204,41 +204,6 @@ def get_questions_by_tag():
     return jsonify({'questions': formatted_questions}), 200
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # This function takes in a `question_id` parameter in the URL and attempts to
 # retrieve the corresponding question from the MongoDB database. If found, the
 # question data is returned in a JSON format similar to the original 
@@ -274,7 +239,6 @@ def get_questions_by_ids():
     else:
         return jsonify({'message': 'No questions found.'}), 404
 
-        
 # This function deletes a question from the MongoDB database by its ID.
 # It takes in a question_id parameter and uses it to query the questions 
 # collection in the database. If the question is found and successfully deleted, 
@@ -284,12 +248,12 @@ def get_questions_by_ids():
 
 @app.route('/questions/id', methods=['DELETE'])
 def delete_question_by_id():
-    data = request.get_json()
-    question_ids = data.get('question_ids')
+    data = request.json
+    question_ids = data['question_ids']
 
     if not question_ids:
         return jsonify({'message': 'Question IDs not provided.'}), 400
-
+ 
     deleted_count = mycol.delete_many({'_id': {'$in': [ObjectId(id) for id in question_ids]}}).deleted_count
 
     if deleted_count > 0:
@@ -330,12 +294,11 @@ def update_questions_by_ids():
         question = mycol.find_one({'_id': ObjectId(question_id)})
         if question:
             status = data['status']
-            revised = True
 
             mycol.update_one(
                 {'_id': ObjectId(question_id)}, 
                 {'$set': {'status': status, 
-                          'revised': revised}}
+                          'revised': True}}
             )
             updated_count += 1
 
