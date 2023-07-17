@@ -196,12 +196,19 @@ def get_questions():
 
 @app.route('/questions/tag', methods=['GET'])
 def get_questions_by_tag():
-    tag = request.json['tag']
+    tag = request.args.get('tag')
 
-    questions = []
+    if tag is None:
+        return jsonify({'error': 'Tag parameter is missing.'}), 400
 
-    for question in mycol.find({"tag": tag}):
-        questions.append({
+    questions = list(mycol.find({"tag": tag}))
+
+    if not questions:
+        return jsonify({'message': 'No questions found with the specified tag.'}), 404
+
+    formatted_questions = []
+    for question in questions:
+        formatted_question = {
             'id': str(question['_id']),
             'tag': question['tag'],
             'level': question['level'],
@@ -210,9 +217,10 @@ def get_questions_by_tag():
             'answer': question['answer'],
             'status': question['status'],
             'revised': question['revised']
-        })
+        }
+        formatted_questions.append(formatted_question)
 
-    return jsonify({'questions': questions}), 200
+    return jsonify({'questions': formatted_questions}), 200
 
 
 
