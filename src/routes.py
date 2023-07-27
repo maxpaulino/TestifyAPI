@@ -39,8 +39,6 @@ def add_question():
     questions_added = 0
 
     if questionType == 'true_or_false':
-        questions_added = 0
-
         while questions_added < number:
             prompt_list = []
             ready = False
@@ -104,6 +102,46 @@ def add_question():
             except Exception as e:
                 return jsonify({'error': str(e)}), 404
         return jsonify({'message': f'{number} questions added successfully'}), 200
+    else:
+        return jsonify({'message': 'Please specify what type of question again'}), 200
+    
+     
+@app.route('/questions/<string:questionType>', methods=['GET'])
+def get_questions(questionType):
+    questions = []
+
+    if questionType == 'true_or_false':
+        for question in mycol.find():
+            questions.append({
+                'id': str(question['_id']),
+                'tag': question['tag'],
+                'level': question['level'],
+                'question': question['question'],
+                'choices': question['choices'],
+                'answer': question['answer'],
+                'status': question['status'],
+                'revised': question['revised']
+            })
+        return jsonify({'questions': questions}), 200
+    
+    elif questionType == 'multiple_choice':
+        for question in mycol.find():
+            questions.append({
+                'id': str(question['_id']),
+                'tag': question['tag'],
+                'level': question['level'],
+                'question': question['question'],
+                'choices': question['choices'],
+                'answer': question['answer'],
+                'status': question['status'],
+                'revised': question['revised']
+            })
+        return jsonify({'questions': questions}), 200
+    
+    else:
+        return jsonify({'message': 'Please specify what type of question again'}), 200
+    
+
 
 
 
