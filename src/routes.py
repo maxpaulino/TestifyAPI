@@ -1,5 +1,5 @@
 
-# Imports
+# IMPORTS
 
 from flask import request, jsonify, send_from_directory
 from src.settings import app, myclient, mycol
@@ -7,12 +7,17 @@ from src.openai_api import generate_mult_choice, generate_true_false
 import os
 import yaml
 
-# Flask routes
+# ROUTES
+
+
+# /.well-known/ai-plugin.json
 
 @app.route('/.well-known/ai-plugin.json')
 def serve_manifest():
     return send_from_directory(os.path.dirname(__file__), 'ai-plugin.json') # Directory likely needs fixing.
 
+
+# /openapi.yaml
 
 @app.route('/openapi.yaml')
 def serve_openapi_yaml():
@@ -21,24 +26,29 @@ def serve_openapi_yaml():
     yaml_data = yaml.load(yaml_data, Loader=yaml.FullLoader)
     return jsonify(yaml_data)
 
+
+# /logo.png
+
 @app.route('/logo.png')
 def serve_logo():
     return send_from_directory(os.path.dirname(__file__), 'logo.png', mimetype='image/png') # And again. 
 
-@app.route('/questions', methods=['POST'])
-def add_question():
+
+# /questions
+
+@app.route('/questions/<string:qType>', methods=['POST'])
+def add_question(qType):
     data = request.json
     tag = data['tag']
     level = data['level']
     number = data['number']  # New JSON argument for the number of questions
-    questionType = data['type'] 
 
     if not tag or not level or not number:
         return {'error': 'Invalid input data'}
 
     questions_added = 0
 
-    if questionType == 'true_or_false':
+    if qType == 'true_or_false':
         while questions_added < number:
             prompt_list = []
             ready = False
@@ -67,7 +77,7 @@ def add_question():
                 return jsonify({'error': str(e)}), 404
 
         return jsonify({'message': f'{questions_added} questions added successfully'}), 200
-    elif questionType == 'multiple_choice':
+    elif qType == 'multiple_choice':
         while questions_added < number:
             prompt_list = []
 
@@ -105,12 +115,14 @@ def add_question():
     else:
         return jsonify({'message': 'Please specify what type of question again'}), 200
     
+
+# /questions/<string:qType>
      
-@app.route('/questions/<string:questionType>', methods=['GET'])
-def get_questions(questionType):
+@app.route('/questions/<string:qType>', methods=['GET'])
+def get_questions(qType):
     questions = []
 
-    if questionType == 'true_or_false':
+    if qType == 'true_or_false':
         for question in mycol.find():
             questions.append({
                 'id': str(question['_id']),
@@ -124,7 +136,7 @@ def get_questions(questionType):
             })
         return jsonify({'questions': questions}), 200
     
-    elif questionType == 'multiple_choice':
+    elif qType == 'multiple_choice':
         for question in mycol.find():
             questions.append({
                 'id': str(question['_id']),
@@ -142,22 +154,27 @@ def get_questions(questionType):
         return jsonify({'message': 'Please specify what type of question again'}), 200
     
 
+# /tags/<string:qType>
 
+@app.route('/tags/<string:qType>', methods=['GET'])
+def get_tags(qType):
+    if qType == "true_or_false": 
+        try: 
+            tags = mycol.distinct("tag")
+            return jsonify(", ".join(tags)), 200  # Join the tags using a comma and space
+        except Exception as e:
+            return jsonify("Error retrieving tags."), 400
+        
+    elif qType == "multiple_choice":
+        try: 
+            tags = mycol.distinct("tag")
+            return jsonify(", ".join(tags)), 200  # Join the tags using a comma and space
+        except Exception as e:
+            return jsonify("Error retrieving tags."), 400
+        
+    else:
+        return jsonify({'message': 'Please specify what type of question again'}), 200
 
-
-@app.route('/tags', methods=['GET'])
-def get_tags():
-    try: 
-        tags = mycol.distinct("tag")
-        return jsonify(", ".join(tags)), 200  # Join the tags using a comma and space
-    except Exception as e:
-        return jsonify("Error retrieving tags."), 400
-
-
-@app.route('/questions', methods=['GET'])
-def get_questions():
-    # The content of the function is omitted for brevity
-    pass
 
 @app.route('/questions/tag', methods=['POST'])
 def get_questions_by_tag():
