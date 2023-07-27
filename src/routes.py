@@ -3,7 +3,7 @@
 
 from flask import request, jsonify, send_from_directory
 from src.settings import app, myclient, mycol
-from src.openai_api import generate_mult_choice
+from src.openai_api import generate_mult_choice, generate_true_false
 import os
 import yaml
 
@@ -39,31 +39,24 @@ def add_question():
     questions_added = 0
 
     if questionType == 'true_or_false':
-
+        questions_added = 0
 
         while questions_added < number:
             prompt_list = []
-
             ready = False
 
-            while ready == False:
-                prompt_list = generate_mult_choice(tag, level).split('\n\n')
-                if len(prompt_list) == 3:
-                    if len(prompt_list[2]) != 4:
-                        ready = True
+            while not ready:
+                prompt_list = generate_true_false(tag, level).split("\n\n")  # Assuming run_generation is defined elsewhere
+                if len(prompt_list) == 2:
+                    ready = True
 
             question = prompt_list[0][3:]
-            choices = prompt_list[1].split('\n')
-            answer = prompt_list[2][3:]
-
-            if answer.startswith('wer: '):
-                answer = prompt_list[2][8:]
+            answer = prompt_list[1][3:].lower() == 'true'  # Assuming the answer is a boolean (True/False)
 
             question_data = {
                 'tag': tag,
                 'level': level,
                 'question': question,
-                'choices': choices,
                 'answer': answer,
                 'status': "pending",
                 'revised': False
@@ -74,7 +67,8 @@ def add_question():
                 questions_added += 1
             except Exception as e:
                 return jsonify({'error': str(e)}), 404
-        return jsonify({'message': f'{number} questions added successfully'}), 200
+
+        return jsonify({'message': f'{questions_added} questions added successfully'}), 200
     elif questionType == 'multiple_choice':
         while questions_added < number:
             prompt_list = []
