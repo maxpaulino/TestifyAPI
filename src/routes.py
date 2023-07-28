@@ -1,7 +1,7 @@
 
 # IMPORTS
 
-from flask import request, jsonify, send_from_directory
+from flask import request, jsonify, send_from_directory, ObjectId
 from src.settings import app, myclient, mycol
 from src.openai_api import generate_mult_choice, generate_true_false
 import os
@@ -129,7 +129,6 @@ def get_questions(qType):
                 'tag': question['tag'],
                 'level': question['level'],
                 'question': question['question'],
-                'choices': question['choices'],
                 'answer': question['answer'],
                 'status': question['status'],
                 'revised': question['revised']
@@ -176,15 +175,67 @@ def get_tags(qType):
         return jsonify({'message': 'Please specify what type of question again'}), 200
 
 
-@app.route('/questions/tag', methods=['POST'])
-def get_questions_by_tag():
-    # The content of the function is omitted for brevity
-    pass
+# POST /questions/id
+# This getter is a POST to maximize number of ids possible to get. Maybe this
+# isn't necessary and I can just turn it to a parameter
+
+@app.route('/questions/id', methods=['POST'])
+def get_questions_by_ids():
+    data = request.json
+    question_ids = data['question_ids']
+
+    if not question_ids:
+        return jsonify({'message': 'No question IDs provided.'}), 400
+
+    tf_questions = tf_col.find({'_id': {'$in': [ObjectId(q_id) for q_id in question_ids]}})
+    mc_questions = mc_col.find({'_id': {'$in': [ObjectId(q_id) for q_id in question_ids]}})
+
+
+    tf_result = []
+    for question in tf_questions:
+        tf_result.append({
+            'id': str(question['_id']),
+            'tag': question['tag'],
+            'level': question['level'],
+            'question': question['question'],
+            'choices': question['choices'],
+            'answer': question['answer'],
+            'status': question['status'],
+            'revised': question['revised']
+        })
+
+    mc_result = []
+    for question in mc_questions:
+        mc_result.append({
+            'id': str(question['_id']),
+            'tag': question['tag'],
+            'level': question['level'],
+            'question': question['question'],
+            'choices': question['choices'],
+            'answer': question['answer'],
+            'status': question['status'],
+            'revised': question['revised']
+        })
+
+
+
+    if mc_result or tf_result:
+        return jsonify(mc_result + tf_result), 200
+    else:
+        return jsonify({'message': 'No questions found.'}), 404
+
 
 @app.route('/questions/id', methods=['POST'])
 def get_questions_by_ids():
     # The content of the function is omitted for brevity
     pass
+
+@app.route('/questions/tag', methods=['POST'])
+def get_questions_by_tag():
+    # The content of the function is omitted for brevity
+    pass
+
+
 
 @app.route('/questions/id', methods=['DELETE'])
 def delete_question_by_id():
