@@ -36,12 +36,13 @@ def serve_logo():
 
 # /questions
 
-@app.route('/questions/<string:qType>', methods=['POST'])
-def add_question(qType):
+@app.route('/questions/', methods=['POST'])
+def add_question():
     data = request.json
     tag = data['tag']
     level = data['level']
     number = data['number']  # New JSON argument for the number of questions
+    qType = data['qType']
 
     if not tag or not level or not number:
         return {'error': 'Invalid input data'}
@@ -229,7 +230,6 @@ def get_questions_by_ids():
 
 @app.route('/questions/tag/<string:tag>/<string:qType>', methods=['GET'])
 def get_questions_by_tag(tag, qType):
-
     if tag is None:
         return jsonify({'message': 'Tag parameter is missing.'}), 400
     
@@ -282,7 +282,7 @@ def get_questions_by_tag(tag, qType):
 # PUT /questions/id/<string:status>
 
 @app.route('/questions/id/', methods=['PUT'])
-def update_questions_by_ids(status):
+def update_questions_by_ids():
     data = request.json
     status = data['status']
     question_ids = data['question_ids']
@@ -315,7 +315,7 @@ def update_questions_by_ids(status):
  # PUT  /questions/tag/<string:tags>/<string:qType>
 
 @app.route('/questions/tag/', methods=['PUT'])
-def put_questions_by_tag(tag, qType):
+def put_questions_by_tag():
     data = request.json
     tag = data['tag']
     qType = data['qType']
