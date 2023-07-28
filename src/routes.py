@@ -225,7 +225,7 @@ def get_questions_by_ids():
         return jsonify({'message': 'No questions found.'}), 404
 
 
- # GET  /questions/tag/<string:tags>
+ # GET  /questions/tag/<string:tags>/<string:qType>
 
 @app.route('/questions/tag/<string:tag>/<string:qType>', methods=['GET'])
 def get_questions_by_tag(tag, qType):
@@ -281,9 +281,10 @@ def get_questions_by_tag(tag, qType):
 
 # PUT /questions/id/<string:status>
 
-@app.route('/questions/id/<string:status>', methods=['PUT'])
+@app.route('/questions/id/', methods=['PUT'])
 def update_questions_by_ids(status):
     data = request.json
+    status = data['status']
     question_ids = data['question_ids']
 
     updated_count = 0
@@ -303,12 +304,55 @@ def update_questions_by_ids(status):
                           'revised': True}}
             )
             updated_count += 1
-            
+
     if updated_count > 0:
         return jsonify({'message': f'{updated_count} question(s) updated successfully.'}), 200
     else:
         return jsonify({'message': 'No questions found.'}), 404
 
 
+
+ # PUT  /questions/tag/<string:tags>/<string:qType>
+
+@app.route('/questions/tag/', methods=['PUT'])
+def put_questions_by_tag(tag, qType):
+    data = request.json
+    tag = data['tag']
+    qType = data['qType']
+    status = data['status']
+
+    if tag is None:
+        return jsonify({'message': 'Tag parameter is missing.'}), 400
+    
+
+    if qType == 'true_or_false':
+        questions = list(tf_col.find({"tag": tag}))
+
+        if not questions:
+            return jsonify({'message': 'No questions found with the specified tag.'}), 404
+
+        for question in questions:
+                tf_col.update_one(
+                {'_id': ObjectId(question["_id"])}, 
+                {'$set': {'status': status, 
+                          'revised': True}}
+            )
+
+        return jsonify({'message': "Set all questions!"}), 200
+    elif qType == 'multiple_choice':
+        questions = list(mc_col.find({"tag": tag}))
+        if not questions:
+            return jsonify({'message': 'No questions found with the specified tag.'}), 404
+
+        for question in questions:
+                mc_col.update_one(
+                {'_id': ObjectId(question["_id"])}, 
+                {'$set': {'status': status, 
+                          'revised': True}}
+            )
+
+        return jsonify({'message': "Set all questions!"}), 200
+    else:
+        return jsonify({'message': 'Please specify what type of question again'}), 200
 
 
