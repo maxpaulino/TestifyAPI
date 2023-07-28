@@ -312,11 +312,12 @@ def update_questions_by_ids():
 
 
 
-# PUT  /questions/tag/<tag>
+# PUT  /questions/tag/
 
-@app.route('/questions/tag/<string:tag>', methods=['PUT'])
+@app.route('/questions/tag/', methods=['PUT'])
 def put_questions_by_tag(tag):
     data = request.json
+    tag = data['tag']
     qType = data['qType']
     status = data['status']
 
@@ -354,9 +355,9 @@ def put_questions_by_tag(tag):
     else:
         return jsonify({'message': 'Please specify what type of question again'}), 200
 
-# PUT  /questions/tag/
+# PUT  /questions
 
-@app.route('/questions/tag/', methods=['PUT'])
+@app.route('/questions', methods=['PUT'])
 def put_questions_by_tag():
     data = request.json
     qType = data['qType']
