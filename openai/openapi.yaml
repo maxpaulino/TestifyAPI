@@ -8,8 +8,7 @@ servers:
 paths:
   /questions:
     post:
-      operationId: addQuestion
-      summary: Add a multiple-choice question
+      operationId: add_questions
       requestBody:
         required: true
         content:
@@ -17,56 +16,53 @@ paths:
             schema:
               $ref: '#/components/schemas/QuestionInput'
       responses:
-        "200":
-          description: Question added successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-    get:
-      operationId: getAllQuestions
-      summary: Get all questions
-      responses:
-        "200":
+        200:
           description: Successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  questions:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Question"
-  /questions/denied:
-    delete:
-      operationId: deleteDeniedQuestions
-      summary: Delete denied questions
-      responses:
-        "200":
-          description: Questions deleted successfully
-          content:
-            application/json:
-              schema:
                 $ref: '#/components/schemas/Message'
-  /questions/id:
-    post:
-      operationId: getQuestions
-      summary: Get multiple questions by IDs
+    put:
+      operationId: update_all_questions
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                question_ids:
-                  type: array
-                  items:
-                    type: string
-                  description: The IDs of the questions
+              $ref: '#/components/schemas/QuestionInput'
       responses:
-        "200":
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    delete:
+      operationId: delete_all_questions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionInput'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /questions/{qType}:
+    get:
+      operationId: get_all_questions
+      parameters:
+        - name: qType
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
           description: Successful operation
           content:
             application/json:
@@ -74,15 +70,27 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Question'
-        "404":
-          description: Questions not found
+  /tags/{qType}:
+    get:
+      operationId: get_tags
+      parameters:
+        - name: qType
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
-    delete:
-      operationId: deleteQuestions
-      summary: Delete multiple questions by IDs
+                type: array
+                items:
+                  type: string
+  /questions/id:
+    post:
+      operationId: get_questions_by_ids
       requestBody:
         required: true
         content:
@@ -94,23 +102,17 @@ paths:
                   type: array
                   items:
                     type: string
-                  description: The IDs of the questions to delete
       responses:
-        "200":
-          description: Questions deleted successfully
+        200:
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
-        "404":
-          description: Questions not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Question'
     put:
-      operationId: setQuestions
-      summary: Update multiple questions by IDs
+      operationId: update_questions_by_ids
       requestBody:
         required: true
         content:
@@ -118,57 +120,22 @@ paths:
             schema:
               type: object
               properties:
-                questionIds:
+                status:
+                  type: string
+                  enum: [approved, denied]
+                question_ids:
                   type: array
                   items:
                     type: string
-                  description: List of question IDs to update
-                status:
-                  type: string
-                  enum:
-                    - approved
-                    - denied
-                  description: Status to assign to the questions
       responses:
-        "200":
-          description: Questions updated successfully
+        200:
+          description: Successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
-        "404":
-          description: Questions not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-  /tags:
-    get:
-      operationId: getTags
-      summary: Get all tags
-      responses:
-        "200":
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  tags:
-                    type: array
-                    items:
-                      type: string
-                    example: ['tag1', 'tag2', 'tag3']
-        "404":
-          description: Tags not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-  /questions/tag:
-    post:
-      operationId: getQuestionsByTags
-      summary: Get questions by tag
+    delete:
+      operationId: delete_questions_by_ids
       requestBody:
         required: true
         content:
@@ -176,23 +143,66 @@ paths:
             schema:
               type: object
               properties:
-                tag:
-                  type: string
-                  description: The tag to filter questions by
+                question_ids:
+                  type: array
+                  items:
+                    type: string
       responses:
-        "200":
-          description: Successful response
+        200:
+          description: Successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  questions:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Question'
-        "404":
-          description: Questions not found
+                $ref: '#/components/schemas/Message'
+  /questions/tag/{tag}/{qType}:
+    get:
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: qType
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Question'
+  /questions/tag:
+    put:
+      operationId: update_questions_by_tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionInput'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    delete:
+      operationId: delete_questions_by_tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionInput'
+      responses:
+        200:
+          description: Successful operation
           content:
             application/json:
               schema:
@@ -239,6 +249,7 @@ components:
         - tag
         - level
         - number
+        - qType
       properties:
         tag:
           type: string
@@ -249,10 +260,14 @@ components:
           description: The difficulty level of the question
           example: "B2"
         number:
-          type: integer
+          qType: integer
           description: The number of questions
-          example: "2"
-
+          example: 2
+        type:
+          type: array
+          description: Type of questions
+          example: [multiple_choice, true_or_false]
+        
     Message:
       type: object
       required:
@@ -262,3 +277,5 @@ components:
           type: string
           description: A message about the result of the operation
           example: "Question added successfully"
+
+
