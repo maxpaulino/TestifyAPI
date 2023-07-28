@@ -14,14 +14,14 @@ import yaml
 
 @app.route('/.well-known/ai-plugin.json')
 def serve_manifest():
-    return send_from_directory(os.path.dirname(__file__), 'ai-plugin.json') # Directory likely needs fixing.
+    return send_from_directory(os.path.dirname(__file__), '/openai/ai-plugin.json') 
 
 
 # /openapi.yaml
 
 @app.route('/openapi.yaml')
 def serve_openapi_yaml():
-    with open(os.path.join(os.path.dirname(__file__), 'openapi.yaml'), 'r') as f: # Again.
+    with open(os.path.join(os.path.dirname(__file__), '/openai/openapi.yaml'), 'r') as f:
         yaml_data = f.read()
     yaml_data = yaml.load(yaml_data, Loader=yaml.FullLoader)
     return jsonify(yaml_data)
@@ -31,7 +31,7 @@ def serve_openapi_yaml():
 
 @app.route('/logo.png')
 def serve_logo():
-    return send_from_directory(os.path.dirname(__file__), 'logo.png', mimetype='image/png') # And again. 
+    return send_from_directory(os.path.dirname(__file__), '/openai/logo.png', mimetype='image/png') 
 
 
 # /questions
