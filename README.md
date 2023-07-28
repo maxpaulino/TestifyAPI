@@ -55,3 +55,138 @@ These variables should be set in your environment or in a .env file.
 - `DELETE /questions/<question_id>` - Deletes a question by its ID.
 - `DELETE /questions/denied` - Deletes all questions with the 'denied' status.
 - `PUT /questions/<question_id>` - Updates the status and revision of a question by its ID.
+
+
+
+1. 
+Endpoint: /.well-known/ai-plugin.json
+Function: serve_manifest
+Methods: GET
+Parameters: None
+Request body used: No
+
+2. 
+Endpoint: /openapi.yaml
+Function: serve_openapi_yaml
+Methods: GET
+Parameters: None
+Request body used: No
+
+3. 
+Endpoint: /logo.png
+Function: serve_logo
+Methods: GET
+Parameters: None
+Request body used: No
+
+4.
+Endpoint: /questions
+Function: add_questions
+Methods: POST
+Parameters: None
+Request body: 
+{
+    tag: "string"
+    level: "string" 
+    number: "int"
+    qType: "string" (Either true_or_false or multiple choice)
+}
+
+5. 
+Endpoint: /questions
+Function: update_all_questions
+Methods: PUT
+Parameters: None
+Request body:
+{
+    qType: "string" (Either true_or_false or multiple choice)
+    status: "status" (Either approved or denied)
+}
+
+6. 
+Endpoint: /questions
+Function: delete_all_questions
+Methods: DELETE
+Parameters: None
+Request body:
+{
+    qType: "string" (Either true_or_false or multiple choice)
+}
+
+7.
+Endpoint: /questions/{qType}
+Function: get_all_questions
+Methods: GET
+Parameters: qType
+Request body: None
+
+8.
+Endpoint: /tags/{qType}
+Function: get_tags
+Methods: GET
+Parameters: qType
+Request body: None
+
+9. 
+Endpoint: /questions/id
+Function: get_questions_by_ids
+Methods: POST
+Parameters: None
+Request body: 
+{
+    question_ids: "array of strings"
+}
+
+10. 
+Endpoint: /questions/id
+Function: update_questions_by_ids
+Methods: PUT
+Parameters: None
+Request body: 
+{
+    status: "string" (Either approved or denied)
+    question_ids: "array of strings"
+}
+
+11.
+Endpoint: /questions/id
+Function: delete_questions_by_ids
+Methods: DELETE
+Parameters: None
+Request body: 
+{
+    question_ids: "array of strings"
+}
+
+12. 
+Endpoint: /questions/tag/{tag}/{qType}
+Function: 
+Methods: GET
+Parameters: tag, qType
+Request body: None
+
+13. 
+Endpoint: /questions/tag
+Function: update_questions_by_tag
+Methods: PUT
+Parameters: None
+Request body:
+{
+    tag: "string"
+    status: "status" (Either approved or denied)
+    qType: "string" (Either true_or_false or multiple choice)
+
+}
+
+14. 
+Endpoint: /questions/tag
+Function: delete_questions_by_tag
+Methods: DELETE
+Parameters: None
+Request body:
+{
+    tag: "string"
+    qType: "string" (Either true_or_false or multiple choice)
+
+}
+

@@ -37,7 +37,7 @@ def serve_logo():
 # /questions
 
 @app.route('/questions', methods=['POST'])
-def add_question():
+def add_questions():
     data = request.json
     tag = data['tag']
     level = data['level']
@@ -358,7 +358,7 @@ def put_questions_by_tag(tag):
 # PUT  /questions
 
 @app.route('/questions', methods=['PUT'])
-def put_questions_by_tag():
+def update_all_questions():
     data = request.json
     qType = data['qType']
     status = data['status']
@@ -412,10 +412,10 @@ def delete_questions_by_ids():
         return jsonify({'message': 'Questions not found.'}), 404
 
 
-# DELETE  /questions/tag/
+# DELETE  /questions/tag
 
-@app.route('/questions/tag/', methods=['DELETE'])
-def delete_questions_by_tag(tag):
+@app.route('/questions/tag', methods=['DELETE'])
+def delete_questions_by_tag():
     data = request.json
     tag = data['tag']
     qType = data['qType']
@@ -443,7 +443,7 @@ def delete_questions_by_tag(tag):
 # DELETE  /questions
 
 @app.route('/questions', methods=['DELETE'])
-def delete_questions_by_tag():
+def delete_all_questions():
     data = request.json
     qType = data['qType']
 
