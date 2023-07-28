@@ -37,7 +37,7 @@ def serve_logo():
 # Required: tag, level, number, dType
 
 @app.route('/questions', methods=['POST'])
-def add_questions():
+def create_questions():
     data = request.json
     tag = data['tag']
     level = data['level']
@@ -49,7 +49,7 @@ def add_questions():
 
     questions_added = 0
 
-    if qType == 'true_or_false':
+    if qType == 'true or false':
         while questions_added < number:
             prompt_list = []
             ready = False
@@ -78,7 +78,7 @@ def add_questions():
                 return jsonify({'error': str(e)}), 404
 
         return jsonify({'message': f'{questions_added} questions added successfully'}), 200
-    elif qType == 'multiple_choice':
+    elif qType == 'multiple choice':
         while questions_added < number:
             prompt_list = []
 
@@ -126,7 +126,7 @@ def update_all_questions():
     qType = data['qType']
     status = data['status']
 
-    if qType == 'true_or_false':
+    if qType == 'true or false':
         questions = list(tf_col.find())
 
         if not questions:
@@ -141,7 +141,7 @@ def update_all_questions():
 
         return jsonify({'message': "Set all questions!"}), 200
     
-    elif qType == 'multiple_choice':
+    elif qType == 'multiple choice':
         questions = list(mc_col.find())
 
         if not questions:
@@ -167,9 +167,9 @@ def delete_all_questions():
     data = request.json
     qType = data['qType']
 
-    if qType == 'true_or_false':
+    if qType == 'true or false':
         deleted_count = tf_col.delete_many({}).deleted_count
-    elif qType == 'multiple_choice':
+    elif qType == 'multiple choice':
         deleted_count = mc_col.delete_many({}).deleted_count
     else:
         return jsonify({'message': 'Invalid question type provided.'}), 400
@@ -187,7 +187,7 @@ def delete_all_questions():
 def get_all_questions(qType):
     questions = []
 
-    if qType == 'true_or_false':
+    if qType == 'true or false':
         for question in tf_col.find():
             questions.append({
                 'id': str(question['_id']),
@@ -200,7 +200,7 @@ def get_all_questions(qType):
             })
         return jsonify({'questions': questions}), 200
     
-    elif qType == 'multiple_choice':
+    elif qType == 'multiple choice':
         for question in mc_col.find():
             questions.append({
                 'id': str(question['_id']),
@@ -223,14 +223,14 @@ def get_all_questions(qType):
 
 @app.route('/tags/<string:qType>', methods=['GET'])
 def get_tags(qType):
-    if qType == "true_or_false": 
+    if qType == "true or false": 
         try: 
             tags = tf_col.distinct("tag")
             return jsonify(", ".join(tags)), 200  # Join the tags using a comma and space
         except Exception as e:
             return jsonify("Error retrieving tags."), 400
         
-    elif qType == "multiple_choice":
+    elif qType == "multiple choice":
         try: 
             tags = mc_col.distinct("tag")
             return jsonify(", ".join(tags)), 200  # Join the tags using a comma and space
@@ -350,7 +350,7 @@ def get_questions_by_tag(tag, qType):
         return jsonify({'message': 'Tag parameter is missing.'}), 400
     
 
-    if qType == 'true_or_false':
+    if qType == 'true or false':
         questions = list(tf_col.find({"tag": tag}))
 
         if not questions:
@@ -371,7 +371,7 @@ def get_questions_by_tag(tag, qType):
             formatted_questions.append(formatted_question)
 
         return jsonify({'questions': formatted_questions}), 200
-    elif qType == 'multiple_choice':
+    elif qType == 'multiple choice':
         questions = list(mc_col.find({"tag": tag}))
 
         if not questions:
@@ -410,7 +410,7 @@ def update_questions_by_tag(tag):
         return jsonify({'message': 'Tag parameter is missing.'}), 400
     
 
-    if qType == 'true_or_false':
+    if qType == 'true or false':
         questions = list(tf_col.find({"tag": tag}))
 
         if not questions:
@@ -424,7 +424,7 @@ def update_questions_by_tag(tag):
             )
 
         return jsonify({'message': "Set all questions!"}), 200
-    elif qType == 'multiple_choice':
+    elif qType == 'multiple choice':
         questions = list(mc_col.find({"tag": tag}))
         if not questions:
             return jsonify({'message': 'No questions found with the specified tag.'}), 404
@@ -454,7 +454,7 @@ def delete_questions_by_tag():
     if tag is None:
         return jsonify({'message': 'Tag parameter is missing.'}), 400
 
-    if qType == 'true_or_false':
+    if qType == 'true or false':
         questions = list(tf_col.find({"tag": tag}))
         deleted_count = tf_col.delete_many({'_id': {'$in': [ObjectId(id) for id in questions]}}).deleted_count
         if deleted_count > 0:
@@ -462,7 +462,7 @@ def delete_questions_by_tag():
         else:
             return jsonify({'message': 'Questions not found.'}), 404
 
-    elif qType == 'multiple_choice':
+    elif qType == 'multiple choice':
         questions = list(mc_col.find({"tag": tag}))
         deleted_count = mc_col.delete_many({'_id': {'$in': [ObjectId(id) for id in questions]}}).deleted_count
         if deleted_count > 0:
