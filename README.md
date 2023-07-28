@@ -58,28 +58,8 @@ These variables should be set in your environment or in a .env file.
 
 
 
-1. 
-Endpoint: /.well-known/ai-plugin.json
-Function: serve_manifest
-Methods: GET
-Parameters: None
-Request body used: No
 
-2. 
-Endpoint: /openapi.yaml
-Function: serve_openapi_yaml
-Methods: GET
-Parameters: None
-Request body used: No
-
-3. 
-Endpoint: /logo.png
-Function: serve_logo
-Methods: GET
-Parameters: None
-Request body used: No
-
-4.
+1.
 Endpoint: /questions
 Function: add_questions
 Methods: POST
@@ -92,7 +72,10 @@ Request body:
     qType: "string" (Either true_or_false or multiple choice)
 }
 
-5. 
+- [x] MC
+- [ ] TF
+
+2. 
 Endpoint: /questions
 Function: update_all_questions
 Methods: PUT
@@ -103,7 +86,7 @@ Request body:
     status: "status" (Either approved or denied)
 }
 
-6. 
+3. 
 Endpoint: /questions
 Function: delete_all_questions
 Methods: DELETE
@@ -113,21 +96,21 @@ Request body:
     qType: "string" (Either true_or_false or multiple choice)
 }
 
-7.
+4.
 Endpoint: /questions/{qType}
 Function: get_all_questions
 Methods: GET
 Parameters: qType
 Request body: None
 
-8.
+5.
 Endpoint: /tags/{qType}
 Function: get_tags
 Methods: GET
 Parameters: qType
 Request body: None
 
-9. 
+6. 
 Endpoint: /questions/id
 Function: get_questions_by_ids
 Methods: POST
@@ -137,7 +120,7 @@ Request body:
     question_ids: "array of strings"
 }
 
-10. 
+7. 
 Endpoint: /questions/id
 Function: update_questions_by_ids
 Methods: PUT
@@ -148,7 +131,7 @@ Request body:
     question_ids: "array of strings"
 }
 
-11.
+8.
 Endpoint: /questions/id
 Function: delete_questions_by_ids
 Methods: DELETE
@@ -158,14 +141,14 @@ Request body:
     question_ids: "array of strings"
 }
 
-12. 
+9. 
 Endpoint: /questions/tag/{tag}/{qType}
 Function: 
 Methods: GET
 Parameters: tag, qType
 Request body: None
 
-13. 
+10. 
 Endpoint: /questions/tag
 Function: update_questions_by_tag
 Methods: PUT
@@ -178,7 +161,7 @@ Request body:
 
 }
 
-14. 
+11. 
 Endpoint: /questions/tag
 Function: delete_questions_by_tag
 Methods: DELETE
