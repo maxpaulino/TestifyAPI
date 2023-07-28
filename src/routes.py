@@ -279,21 +279,36 @@ def get_questions_by_tag(tag, qType):
         return jsonify({'message': 'Please specify what type of question again'}), 200
 
 
+# PUT /questions/id/<string:status>
+
+@app.route('/questions/id/<string:status>', methods=['PUT'])
+def update_questions_by_ids(status):
+    data = request.json
+    question_ids = data['question_ids']
+
+    updated_count = 0
+
+    for question_id in question_ids:
+        if tf_col.find_one({'_id': ObjectId(question_id)}):
+            tf_col.update_one(
+                {'_id': ObjectId(question_id)}, 
+                {'$set': {'status': status, 
+                          'revised': True}}
+            )
+            updated_count += 1
+        elif mc_col.find_one({'_id': ObjectId(question_id)}):
+            mc_col.update_one(
+                {'_id': ObjectId(question_id)}, 
+                {'$set': {'status': status, 
+                          'revised': True}}
+            )
+            updated_count += 1
+            
+    if updated_count > 0:
+        return jsonify({'message': f'{updated_count} question(s) updated successfully.'}), 200
+    else:
+        return jsonify({'message': 'No questions found.'}), 404
 
 
 
 
-@app.route('/questions/id', methods=['DELETE'])
-def delete_question_by_id():
-    # The content of the function is omitted for brevity
-    pass
-
-@app.route('/questions/denied', methods=['DELETE'])
-def delete_denied_questions():
-    # The content of the function is omitted for brevity
-    pass
-
-@app.route('/questions/id', methods=['PUT'])
-def update_questions_by_ids():
-    # The content of the function is omitted for brevity
-    pass
