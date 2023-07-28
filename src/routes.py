@@ -1,7 +1,7 @@
 
 # IMPORTS
-
-from flask import request, jsonify, send_from_directory, ObjectId
+from flask_pymongo import ObjectId
+from flask import request, jsonify, send_from_directory
 from src.settings import app, myclient, tf_col, mc_col
 from src.openai_api import generate_mult_choice, generate_true_false
 import os
