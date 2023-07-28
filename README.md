@@ -112,6 +112,15 @@ Request body: None
 - [x] MC
 - [x] TF
 
+
+
+
+
+
+
+
+
+
 5.
 Endpoint: /tags/{qType}
 Function: get_tags
