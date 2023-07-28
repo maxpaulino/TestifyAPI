@@ -13,6 +13,8 @@ app = Flask(__name__)
 
 app.config['MONGO_URI'] = f"mongodb+srv://maxipaulino:{os.environ.get('MONGO_PASSWORD')}@cluster0.ibeupug.mongodb.net/Testify?retryWrites=true&w=majority"
 myclient = PyMongo(app)
-mycol = myclient.db.Questions
+
+tf_col = myclient.db.tf_questions
+mc_col = myclient.db.mc_questions
 
 # Optimized
