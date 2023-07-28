@@ -2,7 +2,7 @@
 # IMPORTS
 
 from flask import request, jsonify, send_from_directory, ObjectId
-from src.settings import app, myclient, mycol
+from src.settings import app, myclient, tf_col, mc_col
 from src.openai_api import generate_mult_choice, generate_true_false
 import os
 import yaml
@@ -71,7 +71,7 @@ def add_question(qType):
             }
 
             try:
-                mycol.insert_one(question_data)
+                tf_col.insert_one(question_data)
                 questions_added += 1
             except Exception as e:
                 return jsonify({'error': str(e)}), 404
@@ -107,7 +107,7 @@ def add_question(qType):
             }
 
             try:
-                mycol.insert_one(question_data)
+                mc_col.insert_one(question_data)
                 questions_added += 1
             except Exception as e:
                 return jsonify({'error': str(e)}), 404
@@ -123,7 +123,7 @@ def get_questions(qType):
     questions = []
 
     if qType == 'true_or_false':
-        for question in mycol.find():
+        for question in tf_col.find():
             questions.append({
                 'id': str(question['_id']),
                 'tag': question['tag'],
@@ -136,7 +136,7 @@ def get_questions(qType):
         return jsonify({'questions': questions}), 200
     
     elif qType == 'multiple_choice':
-        for question in mycol.find():
+        for question in mc_col.find():
             questions.append({
                 'id': str(question['_id']),
                 'tag': question['tag'],
@@ -159,14 +159,14 @@ def get_questions(qType):
 def get_tags(qType):
     if qType == "true_or_false": 
         try: 
-            tags = mycol.distinct("tag")
+            tags = tf_col.distinct("tag")
             return jsonify(", ".join(tags)), 200  # Join the tags using a comma and space
         except Exception as e:
             return jsonify("Error retrieving tags."), 400
         
     elif qType == "multiple_choice":
         try: 
-            tags = mycol.distinct("tag")
+            tags = mc_col.distinct("tag")
             return jsonify(", ".join(tags)), 200  # Join the tags using a comma and space
         except Exception as e:
             return jsonify("Error retrieving tags."), 400
@@ -225,15 +225,61 @@ def get_questions_by_ids():
         return jsonify({'message': 'No questions found.'}), 404
 
 
-@app.route('/questions/id', methods=['POST'])
-def get_questions_by_ids():
-    # The content of the function is omitted for brevity
-    pass
+ # GET  /questions/tag/<string:tags>
 
-@app.route('/questions/tag', methods=['POST'])
-def get_questions_by_tag():
-    # The content of the function is omitted for brevity
-    pass
+@app.route('/questions/tag/<string:tag>/<string:qType>', methods=['GET'])
+def get_questions_by_tag(tag, qType):
+
+    if tag is None:
+        return jsonify({'message': 'Tag parameter is missing.'}), 400
+    
+
+    if qType == 'true_or_false':
+        questions = list(tf_col.find({"tag": tag}))
+
+        if not questions:
+            return jsonify({'message': 'No questions found with the specified tag.'}), 404
+
+        formatted_questions = []
+        for question in questions:
+            formatted_question = {
+                'id': str(question['_id']),
+                'tag': question['tag'],
+                'level': question['level'],
+                'question': question['question'],
+                'choices': question['choices'],
+                'answer': question['answer'],
+                'status': question['status'],
+                'revised': question['revised']
+            }
+            formatted_questions.append(formatted_question)
+
+        return jsonify({'questions': formatted_questions}), 200
+    elif qType == 'multiple_choice':
+        questions = list(mc_col.find({"tag": tag}))
+
+        if not questions:
+            return jsonify({'message': 'No questions found with the specified tag.'}), 404
+
+        formatted_questions = []
+        for question in questions:
+            formatted_question = {
+                'id': str(question['_id']),
+                'tag': question['tag'],
+                'level': question['level'],
+                'question': question['question'],
+                'answer': question['answer'],
+                'status': question['status'],
+                'revised': question['revised']
+            }
+            formatted_questions.append(formatted_question)
+
+        return jsonify({'questions': formatted_questions}), 200
+    else:
+        return jsonify({'message': 'Please specify what type of question again'}), 200
+
+
+
 
 
 
