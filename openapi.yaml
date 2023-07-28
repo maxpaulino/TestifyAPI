@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Testify API
-  description: An API for generating and managing multiple-choice questions
+  description: An API for generating and managing multiple-choice and true/false questions
   version: 1.0.3
 servers:
   - url: http://localhost:5000
@@ -9,88 +9,104 @@ paths:
   /questions:
     post:
       operationId: add_questions
+      summary: Add questions
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QuestionInput'
+              type: object
+              properties:
+                tag:
+                  type: string
+                level:
+                  type: string
+                number:
+                  type: integer
+                qType:
+                  type: string
+              required:
+                - tag
+                - level
+                - number
+                - qType
       responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
+        '200':
+          description: The number of questions added
+        '404':
+          description: Invalid input data
     put:
       operationId: update_all_questions
+      summary: Update all questions
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QuestionInput'
+              type: object
+              properties:
+                qType:
+                  type: string
+                status:
+                  type: string
       responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
+        '200':
+          description: Status of all questions updated
+        '404':
+          description: No questions found
     delete:
       operationId: delete_all_questions
+      summary: Delete all questions
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QuestionInput'
+              type: object
+              properties:
+                qType:
+                  type: string
       responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
+        '200':
+          description: Number of questions deleted
+        '400':
+          description: Invalid question type provided
+        '404':
+          description: Questions not found
   /questions/{qType}:
     get:
       operationId: get_all_questions
+      summary: Get all questions
       parameters:
-        - name: qType
-          in: path
-          required: true
+        - in: path
+          name: qType
           schema:
             type: string
+          required: true
       responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Question'
+        '200':
+          description: List of questions
+        '404':
+          description: No questions found
   /tags/{qType}:
     get:
       operationId: get_tags
+      summary: Get tags
       parameters:
-        - name: qType
-          in: path
-          required: true
+        - in: path
+          name: qType
           schema:
             type: string
+          required: true
       responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
+        '200':
+          description: List of tags
+        '400':
+          description: Error retrieving tags
   /questions/id:
     post:
       operationId: get_questions_by_ids
+      summary: Get questions by IDs
       requestBody:
         required: true
         content:
@@ -103,16 +119,15 @@ paths:
                   items:
                     type: string
       responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Question'
+        '200':
+          description: Questions retrieved by IDs
+        '400':
+          description: No question IDs provided
+        '404':
+          description: No questions found
     put:
-      operationId: update_questions_by_ids
+      operationId: update_question_by_ids
+      summary: Update questions by IDs
       requestBody:
         required: true
         content:
@@ -122,20 +137,18 @@ paths:
               properties:
                 status:
                   type: string
-                  enum: [approved, denied]
                 question_ids:
                   type: array
                   items:
                     type: string
       responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
+        '200':
+          description: Number of questions updated
+        '404':
+          description: No questions found
     delete:
-      operationId: delete_questions_by_ids
+      operationId: delete_questions_be_ids
+      summary: Delete questions by IDs
       requestBody:
         required: true
         content:
@@ -148,134 +161,74 @@ paths:
                   items:
                     type: string
       responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
+        '200':
+          description: Questions deleted successfully
+        '404':
+          description: Questions not found
   /questions/tag/{tag}/{qType}:
     get:
+      operationId: get_questions_by_tag
+      summary: Get questions by tag
       parameters:
-        - name: tag
-          in: path
-          required: true
+        - in: path
+          name: tag
           schema:
             type: string
-        - name: qType
-          in: path
           required: true
+        - in: path
+          name: qType
           schema:
             type: string
+          required: true
       responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Question'
+        '200':
+          description: List of questions
+        '400':
+          description: Tag parameter is missing
+        '404':
+          description: No questions found with the specified tag
   /questions/tag:
     put:
       operationId: update_questions_by_tag
+      summary: Update questions by tag
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QuestionInput'
+              type: object
+              properties:
+                tag:
+                  type: string
+                qType:
+                  type: string
+                status:
+                  type: string
       responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
+        '200':
+          description: All questions updated
+        '400':
+          description: Tag parameter is missing
+        '404':
+          description: No questions found with the specified tag
     delete:
       operationId: delete_questions_by_tag
+      summary: Delete questions by tag
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QuestionInput'
+              type: object
+              properties:
+                tag:
+                  type: string
+                qType:
+                  type: string
       responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-components:
-  schemas:
-    Question:
-      type: object
-      required:
-        - _id
-        - tag
-        - level
-        - prompt
-        - status
-        - revised
-      properties:
-        _id:
-          type: string
-          description: The unique identifier for the question
-          example: "5f2b39035b71272a7b2c5d2e"
-        tag:
-          type: string
-          description: The category or topic of the question
-          example: "Science"
-        level:
-          type: string
-          description: The difficulty level of the question
-          example: "B2"
-        prompt:
-          type: string
-          description: The question text
-          example: "What is the chemical symbol for Hydrogen?"
-        status:
-          type: string
-          description: The status of the question (e.g., approved, denied, pending)
-          example: "approved"
-        revised:
-          type: boolean
-          description: Indicates whether the question has been revised
-          example: false
-    QuestionInput:
-      type: object
-      required:
-        - tag
-        - level
-        - number
-        - qType
-      properties:
-        tag:
-          type: string
-          description: The category or topic of the question
-          example: "Science"
-        level:
-          type: string
-          description: The difficulty level of the question
-          example: "B2"
-        number:
-          qType: integer
-          description: The number of questions
-          example: 2
-        type:
-          type: array
-          description: Type of questions
-          example: [multiple_choice, true_or_false]
-        
-    Message:
-      type: object
-      required:
-        - message
-      properties:
-        message:
-          type: string
-          description: A message about the result of the operation
-          example: "Question added successfully"
-
-
+        '200':
+          description: Questions deleted successfully
+        '400':
+          description: Tag parameter is missing
+        '404':
+          description: Questions not found
