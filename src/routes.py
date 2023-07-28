@@ -36,7 +36,7 @@ def serve_logo():
 
 # /questions
 
-@app.route('/questions/', methods=['POST'])
+@app.route('/questions', methods=['POST'])
 def add_question():
     data = request.json
     tag = data['tag']
@@ -117,7 +117,7 @@ def add_question():
         return jsonify({'message': 'Please specify what type of question again'}), 200
     
 
-# /questions/<string:qType>
+# GET /questions/<string:qType>
      
 @app.route('/questions/<string:qType>', methods=['GET'])
 def get_questions(qType):
@@ -226,7 +226,7 @@ def get_questions_by_ids():
         return jsonify({'message': 'No questions found.'}), 404
 
 
- # GET  /questions/tag/<string:tags>/<string:qType>
+ # GET  /questions/tag/<string:tag>/<string:qType>
 
 @app.route('/questions/tag/<string:tag>/<string:qType>', methods=['GET'])
 def get_questions_by_tag(tag, qType):
@@ -279,7 +279,7 @@ def get_questions_by_tag(tag, qType):
         return jsonify({'message': 'Please specify what type of question again'}), 200
 
 
-# PUT /questions/id/<string:status>
+# PUT /questions/id/
 
 @app.route('/questions/id/', methods=['PUT'])
 def update_questions_by_ids():
@@ -312,12 +312,11 @@ def update_questions_by_ids():
 
 
 
- # PUT  /questions/tag/<string:tags>/<string:qType>
+# PUT  /questions/tag/<tag>
 
-@app.route('/questions/tag/', methods=['PUT'])
-def put_questions_by_tag():
+@app.route('/questions/tag/<string:tag>', methods=['PUT'])
+def put_questions_by_tag(tag):
     data = request.json
-    tag = data['tag']
     qType = data['qType']
     status = data['status']
 
@@ -355,4 +354,43 @@ def put_questions_by_tag():
     else:
         return jsonify({'message': 'Please specify what type of question again'}), 200
 
+# PUT  /questions/tag/
+
+@app.route('/questions/tag/', methods=['PUT'])
+def put_questions_by_tag():
+    data = request.json
+    qType = data['qType']
+    status = data['status']
+
+    if qType == 'true_or_false':
+        questions = list(tf_col.find())
+
+        if not questions:
+            return jsonify({'message': 'No questions found'}), 404
+
+        for question in questions:
+                tf_col.update_one(
+                {'_id': ObjectId(question["_id"])}, 
+                {'$set': {'status': status, 
+                          'revised': True}}
+            )
+
+        return jsonify({'message': "Set all questions!"}), 200
+    
+    elif qType == 'multiple_choice':
+        questions = list(mc_col.find())
+
+        if not questions:
+            return jsonify({'message': 'No questions found'}), 404
+
+        for question in questions:
+                mc_col.update_one(
+                {'_id': ObjectId(question["_id"])}, 
+                {'$set': {'status': status, 
+                          'revised': True}}
+            )
+
+        return jsonify({'message': "Set all questions!"}), 200
+    else:
+        return jsonify({'message': 'Please specify what type of question again'}), 200
 
