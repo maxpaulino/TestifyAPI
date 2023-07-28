@@ -35,6 +35,7 @@ def serve_logo():
 
 
 # /questions
+# Required: tag, level, number, dType
 
 @app.route('/questions', methods=['POST'])
 def add_questions():
@@ -115,12 +116,76 @@ def add_questions():
         return jsonify({'message': f'{number} questions added successfully'}), 200
     else:
         return jsonify({'message': 'Please specify what type of question again'}), 200
+
+
+# PUT /questions
+# Required: qType
+
+@app.route('/questions', methods=['PUT'])
+def update_all_questions():
+    data = request.json
+    qType = data['qType']
+    status = data['status']
+
+    if qType == 'true_or_false':
+        questions = list(tf_col.find())
+
+        if not questions:
+            return jsonify({'message': 'No questions found'}), 404
+
+        for question in questions:
+                tf_col.update_one(
+                {'_id': ObjectId(question["_id"])}, 
+                {'$set': {'status': status, 
+                          'revised': True}}
+            )
+
+        return jsonify({'message': "Set all questions!"}), 200
     
+    elif qType == 'multiple_choice':
+        questions = list(mc_col.find())
+
+        if not questions:
+            return jsonify({'message': 'No questions found'}), 404
+
+        for question in questions:
+                mc_col.update_one(
+                {'_id': ObjectId(question["_id"])}, 
+                {'$set': {'status': status, 
+                          'revised': True}}
+            )
+
+        return jsonify({'message': "Set all questions!"}), 200
+    else:
+        return jsonify({'message': 'Please specify what type of question again'}), 200
+
+
+# DELETE  /questions
+# Required: qType
+
+@app.route('/questions', methods=['DELETE'])
+def delete_all_questions():
+    data = request.json
+    qType = data['qType']
+
+    if qType == 'true_or_false':
+        deleted_count = tf_col.delete_many({}).deleted_count
+    elif qType == 'multiple_choice':
+        deleted_count = mc_col.delete_many({}).deleted_count
+    else:
+        return jsonify({'message': 'Invalid question type provided.'}), 400
+
+    if deleted_count > 0:
+        return jsonify({'message': f'{deleted_count} questions of type {qType} deleted successfully.'}), 200
+    else:
+        return jsonify({'message': 'Questions not found.'}), 404
+
 
 # GET /questions/<string:qType>
+# Required: None
      
 @app.route('/questions/<string:qType>', methods=['GET'])
-def get_questions(qType):
+def get_all_questions(qType):
     questions = []
 
     if qType == 'true_or_false':
@@ -154,7 +219,8 @@ def get_questions(qType):
         return jsonify({'message': 'Please specify what type of question again'}), 200
     
 
-# /tags/<string:qType>
+#GET /tags/<string:qType>
+# Required: None
 
 @app.route('/tags/<string:qType>', methods=['GET'])
 def get_tags(qType):
@@ -177,8 +243,7 @@ def get_tags(qType):
 
 
 # POST /questions/id
-# This getter is a POST to maximize number of ids possible to get. Maybe this
-# isn't necessary and I can just turn it to a parameter
+# Required: question_ids
 
 @app.route('/questions/id', methods=['POST'])
 def get_questions_by_ids():
@@ -226,7 +291,59 @@ def get_questions_by_ids():
         return jsonify({'message': 'No questions found.'}), 404
 
 
- # GET  /questions/tag/<string:tag>/<string:qType>
+# PUT /questions/id/
+# Required: status, question_ids
+
+@app.route('/questions/id/', methods=['PUT'])
+def update_questions_by_ids():
+    data = request.json
+    status = data['status']
+    question_ids = data['question_ids']
+
+    updated_count = 0
+
+    for question_id in question_ids:
+        if tf_col.find_one({'_id': ObjectId(question_id)}):
+            tf_col.update_one(
+                {'_id': ObjectId(question_id)}, 
+                {'$set': {'status': status, 
+                          'revised': True}}
+            )
+            updated_count += 1
+        elif mc_col.find_one({'_id': ObjectId(question_id)}):
+            mc_col.update_one(
+                {'_id': ObjectId(question_id)}, 
+                {'$set': {'status': status, 
+                          'revised': True}}
+            )
+            updated_count += 1
+
+    if updated_count > 0:
+        return jsonify({'message': f'{updated_count} question(s) updated successfully.'}), 200
+    else:
+        return jsonify({'message': 'No questions found.'}), 404
+
+
+# DELETE /questions/id/
+# Required: question_ids
+
+@app.route('/questions/id/', methods=['DELETE'])
+def delete_questions_by_ids():
+    data = request.json
+    question_ids = data['question_ids']
+
+
+    mc_deleted_count = mc_col.delete_many({'_id': {'$in': [ObjectId(id) for id in question_ids]}}).deleted_count
+    tf_deleted_count = tf_col.delete_many({'_id': {'$in': [ObjectId(id) for id in question_ids]}}).deleted_count
+
+    if mc_deleted_count + tf_deleted_count > 0:
+        return jsonify({'message': 'Questions deleted successfully.'}), 200
+    else:
+        return jsonify({'message': 'Questions not found.'}), 404
+
+
+# GET  /questions/tag/<string:tag>/<string:qType>
+# Required: None
 
 @app.route('/questions/tag/<string:tag>/<string:qType>', methods=['GET'])
 def get_questions_by_tag(tag, qType):
@@ -279,43 +396,12 @@ def get_questions_by_tag(tag, qType):
         return jsonify({'message': 'Please specify what type of question again'}), 200
 
 
-# PUT /questions/id/
-
-@app.route('/questions/id/', methods=['PUT'])
-def update_questions_by_ids():
-    data = request.json
-    status = data['status']
-    question_ids = data['question_ids']
-
-    updated_count = 0
-
-    for question_id in question_ids:
-        if tf_col.find_one({'_id': ObjectId(question_id)}):
-            tf_col.update_one(
-                {'_id': ObjectId(question_id)}, 
-                {'$set': {'status': status, 
-                          'revised': True}}
-            )
-            updated_count += 1
-        elif mc_col.find_one({'_id': ObjectId(question_id)}):
-            mc_col.update_one(
-                {'_id': ObjectId(question_id)}, 
-                {'$set': {'status': status, 
-                          'revised': True}}
-            )
-            updated_count += 1
-
-    if updated_count > 0:
-        return jsonify({'message': f'{updated_count} question(s) updated successfully.'}), 200
-    else:
-        return jsonify({'message': 'No questions found.'}), 404
-
-
 
 # PUT  /questions/tag/
+# Required: tag, qType, status
 
 @app.route('/questions/tag/', methods=['PUT'])
-def put_questions_by_tag(tag):
+def update_questions_by_tag(tag):
     data = request.json
     tag = data['tag']
     qType = data['qType']
@@ -355,64 +441,10 @@ def put_questions_by_tag(tag):
     else:
         return jsonify({'message': 'Please specify what type of question again'}), 200
 
-# PUT  /questions
-
-@app.route('/questions', methods=['PUT'])
-def update_all_questions():
-    data = request.json
-    qType = data['qType']
-    status = data['status']
-
-    if qType == 'true_or_false':
-        questions = list(tf_col.find())
-
-        if not questions:
-            return jsonify({'message': 'No questions found'}), 404
-
-        for question in questions:
-                tf_col.update_one(
-                {'_id': ObjectId(question["_id"])}, 
-                {'$set': {'status': status, 
-                          'revised': True}}
-            )
-
-        return jsonify({'message': "Set all questions!"}), 200
-    
-    elif qType == 'multiple_choice':
-        questions = list(mc_col.find())
-
-        if not questions:
-            return jsonify({'message': 'No questions found'}), 404
-
-        for question in questions:
-                mc_col.update_one(
-                {'_id': ObjectId(question["_id"])}, 
-                {'$set': {'status': status, 
-                          'revised': True}}
-            )
-
-        return jsonify({'message': "Set all questions!"}), 200
-    else:
-        return jsonify({'message': 'Please specify what type of question again'}), 200
-
-# DELETE /questions/id/
-
-@app.route('/questions/id/', methods=['DELETE'])
-def delete_questions_by_ids():
-    data = request.json
-    question_ids = data['question_ids']
-
-
-    mc_deleted_count = mc_col.delete_many({'_id': {'$in': [ObjectId(id) for id in question_ids]}}).deleted_count
-    tf_deleted_count = tf_col.delete_many({'_id': {'$in': [ObjectId(id) for id in question_ids]}}).deleted_count
-
-    if mc_deleted_count + tf_deleted_count > 0:
-        return jsonify({'message': 'Questions deleted successfully.'}), 200
-    else:
-        return jsonify({'message': 'Questions not found.'}), 404
 
 
 # DELETE  /questions/tag
+# Required: tag, qType
 
 @app.route('/questions/tag', methods=['DELETE'])
 def delete_questions_by_tag():
@@ -439,22 +471,3 @@ def delete_questions_by_tag():
         else:
             return jsonify({'message': 'Questions not found.'}), 404
 
-
-# DELETE  /questions
-
-@app.route('/questions', methods=['DELETE'])
-def delete_all_questions():
-    data = request.json
-    qType = data['qType']
-
-    if qType == 'true_or_false':
-        deleted_count = tf_col.delete_many({}).deleted_count
-    elif qType == 'multiple_choice':
-        deleted_count = mc_col.delete_many({}).deleted_count
-    else:
-        return jsonify({'message': 'Invalid question type provided.'}), 400
-
-    if deleted_count > 0:
-        return jsonify({'message': f'{deleted_count} questions of type {qType} deleted successfully.'}), 200
-    else:
-        return jsonify({'message': 'Questions not found.'}), 404
