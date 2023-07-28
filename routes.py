@@ -293,7 +293,7 @@ def get_questions_by_ids():
 # PUT /questions/id/
 # Required: status, question_ids
 
-@app.route('/questions/id/', methods=['PUT'])
+@app.route('/questions/id', methods=['PUT'])
 def update_questions_by_ids():
     data = request.json
     status = data['status']
@@ -326,7 +326,7 @@ def update_questions_by_ids():
 # DELETE /questions/id/
 # Required: question_ids
 
-@app.route('/questions/id/', methods=['DELETE'])
+@app.route('/questions/id', methods=['DELETE'])
 def delete_questions_by_ids():
     data = request.json
     question_ids = data['question_ids']
@@ -399,7 +399,7 @@ def get_questions_by_tag(tag, qType):
 # PUT  /questions/tag/
 # Required: tag, qType, status
 
-@app.route('/questions/tag/', methods=['PUT'])
+@app.route('/questions/tag', methods=['PUT'])
 def update_questions_by_tag(tag):
     data = request.json
     tag = data['tag']
