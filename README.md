@@ -73,7 +73,7 @@ Request body:
 }
 
 - [x] MC
-- [ ] TF
+- [x] TF
 
 2. 
 Endpoint: /questions
@@ -86,6 +86,9 @@ Request body:
     status: "status" (Either approved or denied)
 }
 
+- [x] MC
+- [x] TF
+
 3. 
 Endpoint: /questions
 Function: delete_all_questions
@@ -96,12 +99,18 @@ Request body:
     qType: "string" (Either true_or_false or multiple choice)
 }
 
+- [ ] MC
+- [x] TF
+
 4.
 Endpoint: /questions/{qType}
 Function: get_all_questions
 Methods: GET
 Parameters: qType
 Request body: None
+
+- [x] MC
+- [x] TF
 
 5.
 Endpoint: /tags/{qType}
