@@ -8,8 +8,8 @@ servers:
 paths:
   /questions:
     post:
-      operationId: add_questions
-      summary: Add questions
+      operationId: create_questions
+      summary: Create a questions
       requestBody:
         required: true
         content:
@@ -19,12 +19,20 @@ paths:
               properties:
                 tag:
                   type: string
+                  description: Tag of the question
+                  example: cars
                 level:
                   type: string
+                  description: Level of the question
+                  enum: [A1, A2, B1, B2, C1, C2]
                 number:
                   type: integer
+                  description: Number of questions
+                  example: 2
                 qType:
                   type: string
+                  description: Type of question
+                  enum: [multiple choice, true or false]
               required:
                 - tag
                 - level
@@ -47,8 +55,12 @@ paths:
               properties:
                 qType:
                   type: string
+                  description: Type of question
+                  enum: [multiple choice, true or false]
                 status:
                   type: string
+                  description: Status of the question
+                  enum: [approved, denied]
       responses:
         '200':
           description: Status of all questions updated
@@ -66,6 +78,8 @@ paths:
               properties:
                 qType:
                   type: string
+                  description: Type of question
+                  enum: [multiple choice, true or false]
       responses:
         '200':
           description: Number of questions deleted
@@ -82,6 +96,8 @@ paths:
           name: qType
           schema:
             type: string
+            description: Type of question
+            enum: [multiple choice, true or false]
           required: true
       responses:
         '200':
@@ -97,6 +113,8 @@ paths:
           name: qType
           schema:
             type: string
+            description: Type of question
+            enum: [multiple choice, true or false]
           required: true
       responses:
         '200':
@@ -118,6 +136,9 @@ paths:
                   type: array
                   items:
                     type: string
+                    description: ID of a question
+                    example: "5f2b39035b71272a7b2c5d2e"
+
       responses:
         '200':
           description: Questions retrieved by IDs
@@ -137,10 +158,14 @@ paths:
               properties:
                 status:
                   type: string
+                  description: Status of the question
+                  enum: [approved, denied]
                 question_ids:
                   type: array
                   items:
                     type: string
+                    description: ID of a question
+                    example: "5f2b39035b71272a7b2c5d2e"
       responses:
         '200':
           description: Number of questions updated
@@ -160,6 +185,8 @@ paths:
                   type: array
                   items:
                     type: string
+                    description: ID of a question
+                    example: "5f2b39035b71272a7b2c5d2e"
       responses:
         '200':
           description: Questions deleted successfully
@@ -174,11 +201,15 @@ paths:
           name: tag
           schema:
             type: string
+            description: Tag of the questions
+            example: cars
           required: true
         - in: path
           name: qType
           schema:
             type: string
+            description: Type of question
+            enum: [multiple choice, true or false]
           required: true
       responses:
         '200':
@@ -200,10 +231,16 @@ paths:
               properties:
                 tag:
                   type: string
+                  description: Tag of the questions
+                  example: cars
                 qType:
                   type: string
+                  description: Type of question
+                  enum: [multiple choice, true or false]
                 status:
                   type: string
+                  description: Status of the question
+                  enum: [approved, denied]
       responses:
         '200':
           description: All questions updated
@@ -223,8 +260,12 @@ paths:
               properties:
                 tag:
                   type: string
+                  description: Tag of the questions
+                  example: cars                
                 qType:
                   type: string
+                  description: Type of question
+                  enum: [multiple choice, true or false]
       responses:
         '200':
           description: Questions deleted successfully
