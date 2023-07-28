@@ -3,8 +3,8 @@
 
 from flask import Flask
 from flask_cors import CORS
-from src.settings import PORT, app
-from src.routes import *
+from settings import PORT, app
+from routes import *
 
 # Flask application initialization
 
