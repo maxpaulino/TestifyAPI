@@ -395,3 +395,66 @@ def put_questions_by_tag():
     else:
         return jsonify({'message': 'Please specify what type of question again'}), 200
 
+# DELETE /questions/id/
+
+@app.route('/questions/id/', methods=['DELETE'])
+def delete_questions_by_ids():
+    data = request.json
+    question_ids = data['question_ids']
+
+
+    mc_deleted_count = mc_col.delete_many({'_id': {'$in': [ObjectId(id) for id in question_ids]}}).deleted_count
+    tf_deleted_count = tf_col.delete_many({'_id': {'$in': [ObjectId(id) for id in question_ids]}}).deleted_count
+
+    if mc_deleted_count + tf_deleted_count > 0:
+        return jsonify({'message': 'Questions deleted successfully.'}), 200
+    else:
+        return jsonify({'message': 'Questions not found.'}), 404
+
+
+# DELETE  /questions/tag/
+
+@app.route('/questions/tag/', methods=['DELETE'])
+def delete_questions_by_tag(tag):
+    data = request.json
+    tag = data['tag']
+    qType = data['qType']
+
+    if tag is None:
+        return jsonify({'message': 'Tag parameter is missing.'}), 400
+
+    if qType == 'true_or_false':
+        questions = list(tf_col.find({"tag": tag}))
+        deleted_count = tf_col.delete_many({'_id': {'$in': [ObjectId(id) for id in questions]}}).deleted_count
+        if deleted_count > 0:
+            return jsonify({'message': 'Questions deleted successfully.'}), 200
+        else:
+            return jsonify({'message': 'Questions not found.'}), 404
+
+    elif qType == 'multiple_choice':
+        questions = list(mc_col.find({"tag": tag}))
+        deleted_count = mc_col.delete_many({'_id': {'$in': [ObjectId(id) for id in questions]}}).deleted_count
+        if deleted_count > 0:
+            return jsonify({'message': 'Questions deleted successfully.'}), 200
+        else:
+            return jsonify({'message': 'Questions not found.'}), 404
+
+
+# DELETE  /questions
+
+@app.route('/questions', methods=['DELETE'])
+def delete_questions_by_tag():
+    data = request.json
+    qType = data['qType']
+
+    if qType == 'true_or_false':
+        deleted_count = tf_col.delete_many({}).deleted_count
+    elif qType == 'multiple_choice':
+        deleted_count = mc_col.delete_many({}).deleted_count
+    else:
+        return jsonify({'message': 'Invalid question type provided.'}), 400
+
+    if deleted_count > 0:
+        return jsonify({'message': f'{deleted_count} questions of type {qType} deleted successfully.'}), 200
+    else:
+        return jsonify({'message': 'Questions not found.'}), 404
