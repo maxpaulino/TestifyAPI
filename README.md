@@ -45,149 +45,174 @@ The application uses the following environment variables:
 
 These variables should be set in your environment or in a .env file.
 
-### API Endpoints
+# Quiz API Documentation
 
-- `GET /.well-known/ai-plugin.json` - Serves the AI plugin JSON file.
-- `GET /.well-known/openapi.yaml` - Serves the OpenAPI YAML file.
-- `POST /questions` - Generates a question and adds it to the MongoDB database.
-- `GET /questions` - Retrieves all the questions from the MongoDB database.
-- `GET /questions/<question_id>` - Retrieves a question by its ID.
-- `DELETE /questions/<question_id>` - Deletes a question by its ID.
-- `DELETE /questions/denied` - Deletes all questions with the 'denied' status.
-- `PUT /questions/<question_id>` - Updates the status and revision of a question by its ID.
+This API allows users to interact with a database of quiz questions. It supports various operations such as adding, updating, retrieving, and deleting questions. Each question is characterized by a tag, a level, a type, and a status. The questions are either multiple choice or true or false. They can be approved or denied based on their content. 
 
+## Endpoints
 
-
-
-1.
-Endpoint: /questions
-Function: add_questions
-Methods: POST
-Parameters: None
-Request body: 
+### 1. Add Questions
+- **Endpoint:** `/questions`
+- **Function:** `add_questions`
+- **Method:** `POST`
+- **Parameters:** None
+- **Request body:**
+```json
 {
-    tag: "string"
-    level: "string" 
-    number: "int"
-    qType: "string" (Either true_or_false or multiple choice)
+    "tag": "string",
+    "level": "string",
+    "number": "int",
+    "qType": "string"  // Either "true_or_false" or "multiple choice"
 }
+```
+- **Usage:** Add questions of a certain type, tag, level, and number to the database.
 
-- [x] MC
-- [x] TF
+---
 
-2. 
-Endpoint: /questions
-Function: update_all_questions
-Methods: PUT
-Parameters: None
-Request body:
+### 2. Update All Questions
+- **Endpoint:** `/questions`
+- **Function:** `update_all_questions`
+- **Method:** `PUT`
+- **Parameters:** None
+- **Request body:**
+```json
 {
-    qType: "string" (Either true_or_false or multiple choice)
-    status: "status" (Either approved or denied)
+    "qType": "string",  // Either "true_or_false" or "multiple choice"
+    "status": "string"  // Either "approved" or "denied"
 }
+```
+- **Usage:** Update the status of all questions of a certain type.
 
-- [x] MC
-- [x] TF
+---
 
-3. 
-Endpoint: /questions
-Function: delete_all_questions
-Methods: DELETE
-Parameters: None
-Request body:
+### 3. Delete All Questions
+- **Endpoint:** `/questions`
+- **Function:** `delete_all_questions`
+- **Method:** `DELETE`
+- **Parameters:** None
+- **Request body:**
+```json
 {
-    qType: "string" (Either true_or_false or multiple choice)
+    "qType": "string"  // Either "true_or_false" or "multiple choice"
 }
+```
+- **Usage:** Delete all questions of a certain type from the database.
 
-- [ ] MC
-- [x] TF
+---
 
-4.
-Endpoint: /questions/{qType}
-Function: get_all_questions
-Methods: GET
-Parameters: qType
-Request body: None
+### 4. Get All Questions
+- **Endpoint:** `/questions/{qType}`
+- **Function:** `get_all_questions`
+- **Method:** `GET`
+- **Parameters:** qType
+- **Request body:** None
+- **Usage:** Retrieve all questions of a certain type from the database.
 
-- [x] MC
-- [x] TF
+---
 
+### 5. Get Tags
+- **Endpoint:** `/tags/{qType}`
+- **Function:** `get_tags`
+- **Method:** `GET`
+- **Parameters:** qType
+- **Request body:** None
+- **Usage:** Retrieve all tags for questions of a certain type.
 
+---
 
-
-
-
-
-
-
-
-5.
-Endpoint: /tags/{qType}
-Function: get_tags
-Methods: GET
-Parameters: qType
-Request body: None
-
-6. 
-Endpoint: /questions/id
-Function: get_questions_by_ids
-Methods: POST
-Parameters: None
-Request body: 
+### 6. Get Questions By IDs
+- **Endpoint:** `/questions/id`
+- **Function:** `get_questions_by_ids`
+- **Method:** `POST`
+- **Parameters:** None
+- **Request body:** 
+```json
 {
-    question_ids: "array of strings"
+    "question_ids": ["array of strings"]
 }
+```
+- **Usage:** Retrieve specific questions using their IDs.
 
-7. 
-Endpoint: /questions/id
-Function: update_questions_by_ids
-Methods: PUT
-Parameters: None
-Request body: 
+---
+
+### 7. Update Questions By IDs
+- **Endpoint:** `/questions/id`
+- **Function:** `update_questions_by_ids`
+- **Method:** `PUT`
+- **Parameters:** None
+- **Request body:** 
+```json
 {
-    status: "string" (Either approved or denied)
-    question_ids: "array of strings"
+    "status": "string",  // Either "approved" or "denied"
+    "question_ids": ["array of strings"]
 }
+```
+- **Usage:** Update the status of specific questions using their IDs.
 
-8.
-Endpoint: /questions/id
-Function: delete_questions_by_ids
-Methods: DELETE
-Parameters: None
-Request body: 
+---
+
+### 8. Delete Questions By IDs
+- **Endpoint:** `/questions/id`
+- **Function:** `delete_questions_by_ids`
+- **Method:** `DELETE`
+- **Parameters:** None
+- **Request body:** 
+```json
 {
-    question_ids: "array of strings"
+    "question_ids": ["array of strings"]
 }
+```
+- **Usage:** Delete specific questions using their IDs.
 
-9. 
-Endpoint: /questions/tag/{tag}/{qType}
-Function: 
-Methods: GET
-Parameters: tag, qType
-Request body: None
+---
 
-10. 
-Endpoint: /questions/tag
-Function: update_questions_by_tag
-Methods: PUT
-Parameters: None
-Request body:
+### 9. Get Questions By Tag and Type
+- **Endpoint:** `/questions/tag/{tag}/{qType}`
+- **Function:** `get_questions_by_tag_and_type`
+- **Method:** `GET`
+- **Parameters:** tag, qType
+- **Request body:** None
+- **Usage:** Retrieve questions of a certain tag and type.
+
+---
+
+### 10. Update Questions By Tag
+- **Endpoint:** `/questions/tag`
+- **Function:** `update_questions_by_tag`
+- **Method:** `PUT`
+- **Parameters:** None
+- **Request body:**
+```json
 {
-    tag: "string"
-    status: "status" (Either approved or denied)
-    qType: "string" (Either true_or_false or multiple choice)
-
+    "tag": "string",
+    "status": "string",  // Either "approved" or "denied"
+    "qType": "string"  // Either "true_or_false" or "multiple choice"
 }
+```
+- **Usage:** Update the status of questions with a certain tag.
 
-11. 
-Endpoint: /questions/tag
-Function: delete_questions_by_tag
-Methods: DELETE
-Parameters: None
-Request body:
+---
+
+### 11. Delete Questions By Tag
+- **Endpoint:** `/questions/tag`
+- **Function:** `delete_questions_by_tag`
+- **Method:** `DELETE`
+- **Parameters:** None
+- **Request body:**
+```json
 {
-    tag: "string"
-    qType: "string" (Either true_or_false or multiple choice)
-
+    "tag": "string",
+    "qType": "string"  // Either "true_or_false" or "multiple choice"
 }
+```
+- **Usage:** Delete all questions with a certain tag.
+
+---
+
+## Note
+
+- MC: Multiple Choice Questions
+- TF: True or False Questions
+
+Each operation is designed to work with both types of questions. Different operations might require different information to be provided in the request body. The request body should be a valid JSON object.
 
