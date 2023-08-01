@@ -363,7 +363,6 @@ def get_questions_by_tag(tag, qType):
                 'tag': question['tag'],
                 'level': question['level'],
                 'question': question['question'],
-                'choices': question['choices'],
                 'answer': question['answer'],
                 'status': question['status'],
                 'revised': question['revised']
@@ -400,7 +399,7 @@ def get_questions_by_tag(tag, qType):
 # Required: tag, qType, status
 
 @app.route('/questions/tag', methods=['PUT'])
-def update_questions_by_tag(tag):
+def update_questions_by_tag():
     data = request.json
     tag = data['tag']
     qType = data['qType']
@@ -456,7 +455,7 @@ def delete_questions_by_tag():
 
     if qType == 'true or false':
         questions = list(tf_col.find({"tag": tag}))
-        deleted_count = tf_col.delete_many({'_id': {'$in': [ObjectId(id) for id in questions]}}).deleted_count
+        deleted_count = tf_col.delete_many({'_id': {'$in': [ObjectId(question['_id']) for question in questions]}}).deleted_count
         if deleted_count > 0:
             return jsonify({'message': 'Questions deleted successfully.'}), 200
         else:
@@ -464,7 +463,7 @@ def delete_questions_by_tag():
 
     elif qType == 'multiple choice':
         questions = list(mc_col.find({"tag": tag}))
-        deleted_count = mc_col.delete_many({'_id': {'$in': [ObjectId(id) for id in questions]}}).deleted_count
+        deleted_count = mc_col.delete_many({'_id': {'$in': [ObjectId(question['_id']) for question in questions]}}).deleted_count
         if deleted_count > 0:
             return jsonify({'message': 'Questions deleted successfully.'}), 200
         else:
