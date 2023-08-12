@@ -1,7 +1,6 @@
 
 # Imports
 
-from flask import Flask
 from flask_cors import CORS
 from settings import PORT, app
 from routes import *
